@@ -20,6 +20,10 @@ public class GraphNull implements GraphElement {
         return JsonNull.INSTANCE;
     }
 
+    public Object toAbstractObject() {
+        return null;
+    }
+
     public Map<String[], Object> toTree() {
         Map<String[], Object> map = new HashMap<>();
         map.put(new String[0], null);

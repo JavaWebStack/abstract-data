@@ -88,6 +88,12 @@ public class GraphObject implements GraphElement {
         return object;
     }
 
+    public Object toAbstractObject() {
+        Map<String, Object> map = new HashMap<>();
+        forEach((k,v) -> map.put(k, v.toAbstractObject()));
+        return map;
+    }
+
     public static GraphObject fromJson(JsonObject object){
         GraphObject o = new GraphObject();
         object.keySet().forEach(k -> o.set(k, GraphElement.fromJson(object.get(k))));

@@ -58,6 +58,10 @@ public class GraphPrimitive implements GraphElement {
         return null;
     }
 
+    public Object toAbstractObject() {
+        return value;
+    }
+
     public Map<String[], Object> toTree() {
         Map<String[], Object> tree = new HashMap<>();
         tree.put(new String[0], value);

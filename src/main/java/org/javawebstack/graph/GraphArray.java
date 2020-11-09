@@ -110,6 +110,12 @@ public class GraphArray implements GraphElement, Iterable<GraphElement> {
         return array;
     }
 
+    public Object toAbstractObject() {
+        List<Object> list = new ArrayList<>();
+        elements.forEach(e -> list.add(e.toAbstractObject()));
+        return list;
+    }
+
     public static GraphArray fromJson(JsonArray array){
         GraphArray a = new GraphArray();
         array.forEach(e -> a.add(GraphElement.fromJson(e)));
