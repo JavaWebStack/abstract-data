@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class GraphObject implements GraphElement {
@@ -111,6 +112,10 @@ public class GraphObject implements GraphElement {
             tree.put(k, v);
         }));
         return tree;
+    }
+
+    public Set<String> keys(){
+        return entries.keySet();
     }
 
 }

@@ -34,7 +34,7 @@ public class GraphPrimitive implements GraphElement {
     }
 
     public String string(){
-        return value.toString();
+        return (String) value;
     }
     public Number number(){
         return (Number) value;
@@ -42,8 +42,6 @@ public class GraphPrimitive implements GraphElement {
     public Boolean bool(){
         if(isBoolean())
             return (Boolean) value;
-        if(isString())
-            return Boolean.parseBoolean(string());
         return null;
     }
     public Object value() {
@@ -95,4 +93,9 @@ public class GraphPrimitive implements GraphElement {
             return Type.STRING;
         return null;
     }
+
+    public String toString(){
+        return value.toString();
+    }
+
 }
