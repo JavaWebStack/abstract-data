@@ -57,7 +57,8 @@ public class GraphMapper {
                 public boolean shouldSkipClass(Class<?> aClass) { return false;  }
             });
         }
-        return builder.create();
+        gson = builder.create();
+        return gson;
     }
 
     public GraphElement toGraph(Object object){
@@ -65,6 +66,8 @@ public class GraphMapper {
     }
 
     public <T> T fromGraph(GraphElement element, Class<T> type){
+        if(element == null)
+            return null;
         return gson().fromJson(element.toJson(), type);
     }
 
