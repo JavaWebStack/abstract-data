@@ -1,4 +1,4 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -6,15 +6,15 @@ import com.google.gson.JsonPrimitive;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GraphPrimitive implements GraphElement {
+public class AbstractPrimitive implements AbstractElement {
     private final Object value;
-    public GraphPrimitive(Number value){
+    public AbstractPrimitive(Number value){
         this.value = value;
     }
-    public GraphPrimitive(Boolean value){
+    public AbstractPrimitive(Boolean value){
         this.value = value;
     }
-    public GraphPrimitive(String value){
+    public AbstractPrimitive(String value){
         this.value = value;
     }
     public boolean isNumber(){
@@ -29,7 +29,7 @@ public class GraphPrimitive implements GraphElement {
     public boolean isPrimitive(){
         return true;
     }
-    public GraphPrimitive primitive() {
+    public AbstractPrimitive primitive() {
         return this;
     }
 
@@ -68,23 +68,23 @@ public class GraphPrimitive implements GraphElement {
         return tree;
     }
 
-    public static GraphPrimitive fromJson(JsonPrimitive primitive){
+    public static AbstractPrimitive fromJson(JsonPrimitive primitive){
         if(primitive == null)
             return null;
         if(primitive.isNumber())
-            return new GraphPrimitive(primitive.getAsNumber());
+            return new AbstractPrimitive(primitive.getAsNumber());
         if(primitive.isBoolean())
-            return new GraphPrimitive(primitive.getAsBoolean());
-        return new GraphPrimitive(primitive.getAsString());
+            return new AbstractPrimitive(primitive.getAsBoolean());
+        return new AbstractPrimitive(primitive.getAsString());
     }
 
-    public static GraphPrimitive from(Object object){
+    public static AbstractPrimitive from(Object object){
         if(object instanceof Number)
-            return new GraphPrimitive((Number) object);
+            return new AbstractPrimitive((Number) object);
         if(object instanceof Boolean)
-            return new GraphPrimitive((Boolean) object);
+            return new AbstractPrimitive((Boolean) object);
         if(object instanceof String)
-            return new GraphPrimitive((String) object);
+            return new AbstractPrimitive((String) object);
         return null;
     }
 

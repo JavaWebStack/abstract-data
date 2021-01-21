@@ -1,4 +1,4 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.FieldNamingPolicy;
 

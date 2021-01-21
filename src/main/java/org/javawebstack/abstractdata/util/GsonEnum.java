@@ -1,4 +1,4 @@
-package org.javawebstack.graph.util;
+package org.javawebstack.abstractdata.util;
 
 public interface GsonEnum {
     String gsonValue();

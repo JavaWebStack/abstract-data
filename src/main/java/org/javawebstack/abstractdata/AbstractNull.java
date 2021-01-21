@@ -1,4 +1,4 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -6,11 +6,11 @@ import com.google.gson.JsonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GraphNull implements GraphElement {
+public class AbstractNull implements AbstractElement {
 
-    public static final GraphNull INSTANCE = new GraphNull();
+    public static final AbstractNull INSTANCE = new AbstractNull();
 
-    private GraphNull(){}
+    private AbstractNull(){}
 
     public boolean isNull() {
         return true;

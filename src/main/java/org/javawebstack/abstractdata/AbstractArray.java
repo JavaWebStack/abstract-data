@@ -1,4 +1,4 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -9,85 +9,85 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class GraphArray implements GraphElement, Iterable<GraphElement> {
+public class AbstractArray implements AbstractElement, Iterable<AbstractElement> {
 
-    private final List<GraphElement> elements = new ArrayList<>();
+    private final List<AbstractElement> elements = new ArrayList<>();
 
     public boolean isArray() {
         return true;
     }
 
-    public GraphArray array() {
+    public AbstractArray array() {
         return this;
     }
 
-    public GraphArray add(GraphElement element) {
+    public AbstractArray add(AbstractElement element) {
         if (element == null)
-            element = GraphNull.INSTANCE;
+            element = AbstractNull.INSTANCE;
         elements.add(element);
         return this;
     }
 
-    public GraphArray addNull() {
-        return add(GraphNull.INSTANCE);
+    public AbstractArray addNull() {
+        return add(AbstractNull.INSTANCE);
     }
 
-    public GraphArray add(Number value) {
+    public AbstractArray add(Number value) {
         if (value == null)
             return addNull();
-        return add(new GraphPrimitive(value));
+        return add(new AbstractPrimitive(value));
     }
 
-    public GraphArray add(Boolean value) {
+    public AbstractArray add(Boolean value) {
         if (value == null)
             return addNull();
-        return add(new GraphPrimitive(value));
+        return add(new AbstractPrimitive(value));
     }
 
-    public GraphArray add(String value) {
+    public AbstractArray add(String value) {
         if (value == null)
             return addNull();
-        return add(new GraphPrimitive(value));
+        return add(new AbstractPrimitive(value));
     }
 
-    public GraphArray setNull(int i){
-        elements.set(i, GraphNull.INSTANCE);
+    public AbstractArray setNull(int i){
+        elements.set(i, AbstractNull.INSTANCE);
         return this;
     }
 
-    public GraphArray set(int i, GraphElement element){
+    public AbstractArray set(int i, AbstractElement element){
         elements.set(i, element);
         return this;
     }
 
-    public GraphArray set(int i, Number value){
+    public AbstractArray set(int i, Number value){
         if(value == null)
             return setNull(i);
-        return set(i, new GraphPrimitive(value));
+        return set(i, new AbstractPrimitive(value));
     }
 
-    public GraphArray set(int i, Boolean value){
+    public AbstractArray set(int i, Boolean value){
         if(value == null)
             return setNull(i);
-        return set(i, new GraphPrimitive(value));
+        return set(i, new AbstractPrimitive(value));
     }
 
-    public GraphArray set(int i, String value){
+    public AbstractArray set(int i, String value){
         if(value == null)
             return setNull(i);
-        return set(i, new GraphPrimitive(value));
+        return set(i, new AbstractPrimitive(value));
     }
 
-    public GraphArray remove(int i){
+    public AbstractArray remove(int i){
         elements.remove(i);
         return this;
     }
 
-    public GraphElement get(int i){
+    public AbstractElement get(int i){
         return elements.get(i);
     }
 
-    public Stream<GraphElement> stream(){
+    public Stream<AbstractElement> stream(){
         return elements.stream();
     }
 
@@ -95,12 +95,12 @@ public class GraphArray implements GraphElement, Iterable<GraphElement> {
         return elements.size();
     }
 
-    public GraphArray clear() {
+    public AbstractArray clear() {
         elements.clear();
         return this;
     }
 
-    public Iterator<GraphElement> iterator() {
+    public Iterator<AbstractElement> iterator() {
         return elements.iterator();
     }
 
@@ -116,9 +116,9 @@ public class GraphArray implements GraphElement, Iterable<GraphElement> {
         return list;
     }
 
-    public static GraphArray fromJson(JsonArray array){
-        GraphArray a = new GraphArray();
-        array.forEach(e -> a.add(GraphElement.fromJson(e)));
+    public static AbstractArray fromJson(JsonArray array){
+        AbstractArray a = new AbstractArray();
+        array.forEach(e -> a.add(AbstractElement.fromJson(e)));
         return a;
     }
 
@@ -126,8 +126,8 @@ public class GraphArray implements GraphElement, Iterable<GraphElement> {
         return Type.ARRAY;
     }
 
-    public GraphObject object(){
-        GraphObject o = new GraphObject();
+    public AbstractObject object(){
+        AbstractObject o = new AbstractObject();
         for(int i=0; i<size(); i++)
             o.set(String.valueOf(i), get(i));
         return o;

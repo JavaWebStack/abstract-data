@@ -1,16 +1,16 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 
-public class GraphMapper {
+public class AbstractMapper {
 
     private Gson gson;
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private boolean exposeRequired = false;
 
-    public GraphMapper setNamingPolicy(NamingPolicy namingPolicy){
+    public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy){
         this.namingPolicy = namingPolicy;
         gson = null;
         return this;
@@ -20,7 +20,7 @@ public class GraphMapper {
         return namingPolicy;
     }
 
-    public GraphMapper setExposeRequired(boolean exposeRequired) {
+    public AbstractMapper setExposeRequired(boolean exposeRequired) {
         this.exposeRequired = exposeRequired;
         gson = null;
         return this;
@@ -30,7 +30,7 @@ public class GraphMapper {
         return exposeRequired;
     }
 
-    public GraphMapper setDateFormat(String dateFormat) {
+    public AbstractMapper setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
         gson = null;
         return this;
@@ -61,11 +61,11 @@ public class GraphMapper {
         return gson;
     }
 
-    public GraphElement toGraph(Object object){
-        return GraphElement.fromJson(gson().toJsonTree(object));
+    public AbstractElement toAbstract(Object object){
+        return AbstractElement.fromJson(gson().toJsonTree(object));
     }
 
-    public <T> T fromGraph(GraphElement element, Class<T> type){
+    public <T> T fromAbstract(AbstractElement element, Class<T> type){
         if(element == null)
             return null;
         return gson().fromJson(element.toJson(), type);

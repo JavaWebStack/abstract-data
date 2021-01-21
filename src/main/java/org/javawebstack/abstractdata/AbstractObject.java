@@ -1,4 +1,4 @@
-package org.javawebstack.graph;
+package org.javawebstack.abstractdata;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -8,46 +8,46 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public class GraphObject implements GraphElement {
+public class AbstractObject implements AbstractElement {
 
-    private final Map<String, GraphElement> entries = new HashMap<>();
+    private final Map<String, AbstractElement> entries = new HashMap<>();
 
-    public GraphObject setNull(String key){
-        set(key, GraphNull.INSTANCE);
+    public AbstractObject setNull(String key){
+        set(key, AbstractNull.INSTANCE);
         return this;
     }
 
-    public GraphObject set(String key, GraphElement value){
+    public AbstractObject set(String key, AbstractElement value){
         if(value == null)
-            value = GraphNull.INSTANCE;
+            value = AbstractNull.INSTANCE;
         entries.put(key, value);
         return this;
     }
 
-    public GraphObject set(String key, Number value){
+    public AbstractObject set(String key, Number value){
         if(value == null)
             return setNull(key);
-        return set(key, new GraphPrimitive(value));
+        return set(key, new AbstractPrimitive(value));
     }
 
-    public GraphObject set(String key, Boolean value){
+    public AbstractObject set(String key, Boolean value){
         if(value == null)
             return setNull(key);
-        return set(key, new GraphPrimitive(value));
+        return set(key, new AbstractPrimitive(value));
     }
 
-    public GraphObject set(String key, String value){
+    public AbstractObject set(String key, String value){
         if(value == null)
             return setNull(key);
-        return set(key, new GraphPrimitive(value));
+        return set(key, new AbstractPrimitive(value));
     }
 
-    public GraphObject remove(String key){
+    public AbstractObject remove(String key){
         entries.remove(key);
         return this;
     }
 
-    public GraphObject clear(){
+    public AbstractObject clear(){
         entries.clear();
         return this;
     }
@@ -56,11 +56,11 @@ public class GraphObject implements GraphElement {
         return true;
     }
 
-    public GraphObject object() {
+    public AbstractObject object() {
         return this;
     }
 
-    public GraphElement get(String key){
+    public AbstractElement get(String key){
         return entries.get(key);
     }
 
@@ -72,8 +72,8 @@ public class GraphObject implements GraphElement {
         return entries.size();
     }
 
-    public GraphArray array(){
-        GraphArray array = new GraphArray();
+    public AbstractArray array(){
+        AbstractArray array = new AbstractArray();
         for(int i=0; i<size(); i++){
             if(!has(String.valueOf(i)))
                 return null;
@@ -94,9 +94,9 @@ public class GraphObject implements GraphElement {
         return map;
     }
 
-    public static GraphObject fromJson(JsonObject object){
-        GraphObject o = new GraphObject();
-        object.keySet().forEach(k -> o.set(k, GraphElement.fromJson(object.get(k))));
+    public static AbstractObject fromJson(JsonObject object){
+        AbstractObject o = new AbstractObject();
+        object.keySet().forEach(k -> o.set(k, AbstractElement.fromJson(object.get(k))));
         return o;
     }
 
@@ -104,7 +104,7 @@ public class GraphObject implements GraphElement {
         return Type.OBJECT;
     }
 
-    public GraphObject forEach(BiConsumer<String, GraphElement> biConsumer){
+    public AbstractObject forEach(BiConsumer<String, AbstractElement> biConsumer){
         entries.forEach(biConsumer);
         return this;
     }
