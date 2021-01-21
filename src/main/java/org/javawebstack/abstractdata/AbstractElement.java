@@ -170,7 +170,7 @@ public interface AbstractElement {
     }
 
     static AbstractElement fromJson(String json) {
-        return fromJson(new Gson().fromJson(json, JsonElement.class));
+        return fromJson(new GsonBuilder().setLenient().create().fromJson(json, JsonElement.class));
     }
 
     static AbstractElement fromTree(Map<String[], Object> tree) {
