@@ -30,6 +30,10 @@ public class AbstractNull implements AbstractElement {
         return map;
     }
 
+    public AbstractElement clone() {
+        return this;
+    }
+
     public Type getType() {
         return Type.NULL;
     }

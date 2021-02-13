@@ -155,6 +155,8 @@ public interface AbstractElement {
         return toFormData().toString();
     }
 
+    AbstractElement clone();
+
     Map<String[], Object> toTree();
 
     static AbstractElement fromJson(JsonElement element) {

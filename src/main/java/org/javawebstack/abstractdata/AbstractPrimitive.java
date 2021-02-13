@@ -102,4 +102,8 @@ public class AbstractPrimitive implements AbstractElement {
         return value.toString();
     }
 
+    public AbstractElement clone() {
+        return from(value);
+    }
+
 }

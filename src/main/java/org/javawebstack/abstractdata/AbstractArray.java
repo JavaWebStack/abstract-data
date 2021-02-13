@@ -137,4 +137,10 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return object().toTree();
     }
 
+    public AbstractElement clone() {
+        AbstractArray array = new AbstractArray();
+        forEach(e -> array.add(e.clone()));
+        return array;
+    }
+
 }
