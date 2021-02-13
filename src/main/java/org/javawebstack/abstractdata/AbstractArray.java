@@ -50,12 +50,15 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return add(new AbstractPrimitive(value));
     }
 
-    public AbstractArray setNull(int i){
-        elements.set(i, AbstractNull.INSTANCE);
-        return this;
+    public AbstractArray setNull(int i) {
+        return set(i, AbstractNull.INSTANCE);
     }
 
     public AbstractArray set(int i, AbstractElement element){
+        if(element == null)
+            return setNull(i);
+        while (elements.size() <= i)
+            addNull();
         elements.set(i, element);
         return this;
     }
