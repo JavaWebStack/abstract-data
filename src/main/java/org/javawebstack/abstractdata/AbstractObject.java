@@ -3,6 +3,7 @@ package org.javawebstack.abstractdata;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -107,6 +108,24 @@ public class AbstractObject implements AbstractElement {
     public AbstractObject forEach(BiConsumer<String, AbstractElement> biConsumer){
         entries.forEach(biConsumer);
         return this;
+    }
+
+    public <T> T fill(Object object) {
+        Class clazz = object.getClass();
+
+        for (Field field : clazz.getFields()) {
+            if (has(field.getName())) {
+                field.setAccessible(true);
+
+                try {
+                    field.set(object, get(field.getName()).toAbstractObject());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return (T) object;
     }
 
     public Map<String[], Object> toTree(){
