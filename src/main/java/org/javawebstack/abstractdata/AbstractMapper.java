@@ -2,6 +2,7 @@ package org.javawebstack.abstractdata;
 
 import com.google.gson.*;
 import com.google.gson.annotations.Expose;
+import org.javawebstack.abstractdata.util.GsonAbstractDataAdapter;
 
 public class AbstractMapper {
 
@@ -44,6 +45,11 @@ public class AbstractMapper {
         if(gson != null)
             return gson;
         GsonBuilder builder = new GsonBuilder()
+                .registerTypeAdapter(AbstractElement.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractObject.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractArray.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractPrimitive.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractNull.class, new GsonAbstractDataAdapter<>())
                 .setFieldNamingPolicy(namingPolicy.getGsonPolicy());
         if(dateFormat != null)
             builder.setDateFormat(dateFormat);
