@@ -21,6 +21,30 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return this;
     }
 
+    public AbstractObject object(int index) {
+        return get(index).object();
+    }
+
+    public AbstractArray array(int index) {
+        return get(index).array();
+    }
+
+    public AbstractPrimitive primitive(int index) {
+        return get(index).primitive();
+    }
+
+    public String string(int index) {
+        return get(index).string();
+    }
+
+    public Boolean bool(int index) {
+        return get(index).bool();
+    }
+
+    public Number number(int index) {
+        return get(index).number();
+    }
+
     public AbstractArray add(AbstractElement element) {
         if (element == null)
             element = AbstractNull.INSTANCE;

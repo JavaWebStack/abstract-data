@@ -83,6 +83,30 @@ public class AbstractObject implements AbstractElement {
         return array;
     }
 
+    public AbstractObject object(String key) {
+        return get(key).object();
+    }
+
+    public AbstractArray array(String key) {
+        return get(key).array();
+    }
+
+    public AbstractPrimitive primitive(String key) {
+        return get(key).primitive();
+    }
+
+    public String string(String key) {
+        return get(key).string();
+    }
+
+    public Boolean bool(String key) {
+        return get(key).bool();
+    }
+
+    public Number number(String key) {
+        return get(key).number();
+    }
+
     public JsonElement toJson() {
         JsonObject object = new JsonObject();
         entries.forEach((k,v) -> object.add(k, v.toJson()));
