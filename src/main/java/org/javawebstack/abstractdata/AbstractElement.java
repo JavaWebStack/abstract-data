@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface AbstractElement {
+
     Type getType();
 
     default boolean isPrimitive() {
@@ -172,7 +173,7 @@ public interface AbstractElement {
     }
 
     static AbstractElement fromJson(String json) {
-        return fromJson(new GsonBuilder().setLenient().create().fromJson(json, JsonElement.class));
+        return fromJson(new GsonBuilder().create().fromJson(json, JsonElement.class));
     }
 
     static AbstractElement fromTree(Map<String[], Object> tree) {
