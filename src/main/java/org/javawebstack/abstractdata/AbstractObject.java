@@ -167,6 +167,10 @@ public class AbstractObject implements AbstractElement {
         return entries.keySet();
     }
 
+    public AbstractArray values(){
+        return AbstractArray.fromList(entries.values());
+    }
+
     public AbstractElement clone() {
         AbstractObject object = new AbstractObject();
         forEach((k, v) -> object.set(k, v.clone()));

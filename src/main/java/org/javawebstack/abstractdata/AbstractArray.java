@@ -1,17 +1,15 @@
 package org.javawebstack.abstractdata;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class AbstractArray implements AbstractElement, Iterable<AbstractElement> {
 
-    private final List<AbstractElement> elements = new ArrayList<>();
+    private final List<AbstractElement> elements;
 
     public boolean isArray() {
         return true;
@@ -50,6 +48,24 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
             element = AbstractNull.INSTANCE;
         elements.add(element);
         return this;
+    }
+
+    public AbstractArray(){
+        elements = new ArrayList<>();
+    }
+
+    public AbstractArray(Object[] objects){
+        this();
+        for (Object o : objects) {
+            if (o instanceof AbstractElement)
+                elements.add((AbstractElement) o);
+            else
+                elements.add(AbstractElement.fromAbstractObject(o));
+        }
+    }
+
+    public AbstractArray(Collection<Object> abstractElements){
+        this(abstractElements.toArray());
     }
 
     public AbstractArray addNull() {
@@ -110,6 +126,10 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return this;
     }
 
+    public AbstractElement[] toArray(){
+        return elements.toArray(new AbstractElement[0]);
+    }
+
     public AbstractElement get(int i){
         return elements.get(i);
     }
@@ -120,6 +140,14 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public int size() {
         return elements.size();
+    }
+
+    public boolean contains(Object o){
+        for (AbstractElement element : elements) {
+            if (o instanceof AbstractElement ? ((AbstractElement) o).toAbstractObject().equals(element.toAbstractObject()) : element.toAbstractObject().equals(o))
+                return true;
+        }
+        return false;
     }
 
     public AbstractArray clear() {
@@ -147,6 +175,15 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         AbstractArray a = new AbstractArray();
         array.forEach(e -> a.add(AbstractElement.fromJson(e)));
         return a;
+    }
+
+
+    public static AbstractArray fromArray(Object[] objects){
+        return new AbstractArray(objects);
+    }
+
+    public static AbstractArray fromList(Collection collection){
+        return new AbstractArray(collection);
     }
 
     public Type getType() {
