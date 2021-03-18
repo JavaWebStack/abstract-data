@@ -121,7 +121,7 @@ public class AbstractObject implements AbstractElement {
 
     public static AbstractObject fromJson(JsonObject object){
         AbstractObject o = new AbstractObject();
-        object.keySet().forEach(k -> o.set(k, AbstractElement.fromJson(object.get(k))));
+        object.entrySet().stream().map(Map.Entry::getKey).forEach(k -> o.set(k, AbstractElement.fromJson(object.get(k))));
         return o;
     }
 
