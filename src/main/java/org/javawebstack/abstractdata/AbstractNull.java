@@ -10,7 +10,8 @@ public class AbstractNull implements AbstractElement {
 
     public static final AbstractNull INSTANCE = new AbstractNull();
 
-    private AbstractNull(){}
+    private AbstractNull() {
+    }
 
     public boolean isNull() {
         return true;

@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -14,47 +13,47 @@ public class AbstractObject implements AbstractElement {
 
     private final Map<String, AbstractElement> entries = new HashMap<>();
 
-    public AbstractObject setNull(String key){
+    public AbstractObject setNull(String key) {
         set(key, AbstractNull.INSTANCE);
         return this;
     }
 
-    public AbstractObject set(String key, AbstractElement value){
-        if(value == null)
+    public AbstractObject set(String key, AbstractElement value) {
+        if (value == null)
             value = AbstractNull.INSTANCE;
         entries.put(key, value);
         return this;
     }
 
-    public AbstractObject set(String key, Number value){
-        if(value == null)
+    public AbstractObject set(String key, Number value) {
+        if (value == null)
             return setNull(key);
         return set(key, new AbstractPrimitive(value));
     }
 
-    public AbstractObject set(String key, Boolean value){
-        if(value == null)
+    public AbstractObject set(String key, Boolean value) {
+        if (value == null)
             return setNull(key);
         return set(key, new AbstractPrimitive(value));
     }
 
-    public AbstractObject set(String key, String value){
-        if(value == null)
+    public AbstractObject set(String key, String value) {
+        if (value == null)
             return setNull(key);
         return set(key, new AbstractPrimitive(value));
     }
 
-    public AbstractObject remove(String key){
+    public AbstractObject remove(String key) {
         entries.remove(key);
         return this;
     }
 
-    public AbstractObject clear(){
+    public AbstractObject clear() {
         entries.clear();
         return this;
     }
 
-    public boolean isObject(){
+    public boolean isObject() {
         return true;
     }
 
@@ -62,7 +61,7 @@ public class AbstractObject implements AbstractElement {
         return this;
     }
 
-    public AbstractElement get(String key){
+    public AbstractElement get(String key) {
         return entries.get(key);
     }
 
@@ -71,18 +70,18 @@ public class AbstractObject implements AbstractElement {
         return (has(key) && !value.isNull()) ? value : orElse;
     }
 
-    public boolean has(String key){
+    public boolean has(String key) {
         return entries.containsKey(key);
     }
 
-    public int size(){
+    public int size() {
         return entries.size();
     }
 
-    public AbstractArray array(){
+    public AbstractArray array() {
         AbstractArray array = new AbstractArray();
-        for(int i=0; i<size(); i++){
-            if(!has(String.valueOf(i)))
+        for (int i = 0; i < size(); i++) {
+            if (!has(String.valueOf(i)))
                 return null;
             array.add(get(String.valueOf(i)));
         }
@@ -139,17 +138,17 @@ public class AbstractObject implements AbstractElement {
 
     public JsonElement toJson() {
         JsonObject object = new JsonObject();
-        entries.forEach((k,v) -> object.add(k, v.toJson()));
+        entries.forEach((k, v) -> object.add(k, v.toJson()));
         return object;
     }
 
     public Object toAbstractObject() {
         Map<String, Object> map = new HashMap<>();
-        forEach((k,v) -> map.put(k, v.toAbstractObject()));
+        forEach((k, v) -> map.put(k, v.toAbstractObject()));
         return map;
     }
 
-    public static AbstractObject fromJson(JsonObject object){
+    public static AbstractObject fromJson(JsonObject object) {
         AbstractObject o = new AbstractObject();
         object.entrySet().stream().map(Map.Entry::getKey).forEach(k -> o.set(k, AbstractElement.fromJson(object.get(k))));
         return o;
@@ -159,7 +158,7 @@ public class AbstractObject implements AbstractElement {
         return Type.OBJECT;
     }
 
-    public AbstractObject forEach(BiConsumer<String, AbstractElement> biConsumer){
+    public AbstractObject forEach(BiConsumer<String, AbstractElement> biConsumer) {
         entries.forEach(biConsumer);
         return this;
     }
@@ -182,10 +181,10 @@ public class AbstractObject implements AbstractElement {
         return (T) object;
     }
 
-    public Map<String[], Object> toTree(){
+    public Map<String[], Object> toTree() {
         Map<String[], Object> tree = new HashMap<>();
         forEach((key, value) -> value.toTree().forEach((keys, v) -> {
-            String[] k = new String[keys.length+1];
+            String[] k = new String[keys.length + 1];
             k[0] = key;
             System.arraycopy(keys, 0, k, 1, keys.length);
             tree.put(k, v);
@@ -193,11 +192,11 @@ public class AbstractObject implements AbstractElement {
         return tree;
     }
 
-    public Set<String> keys(){
+    public Set<String> keys() {
         return entries.keySet();
     }
 
-    public AbstractArray values(){
+    public AbstractArray values() {
         return AbstractArray.fromList(entries.values());
     }
 

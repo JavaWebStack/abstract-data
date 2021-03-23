@@ -9,9 +9,11 @@ public enum NamingPolicy {
     SNAKE_CASE(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES),
     KEBAB_CASE(FieldNamingPolicy.LOWER_CASE_WITH_DASHES);
     private final FieldNamingPolicy policy;
-    NamingPolicy(FieldNamingPolicy policy){
+
+    NamingPolicy(FieldNamingPolicy policy) {
         this.policy = policy;
     }
+
     public FieldNamingPolicy getGsonPolicy() {
         return policy;
     }

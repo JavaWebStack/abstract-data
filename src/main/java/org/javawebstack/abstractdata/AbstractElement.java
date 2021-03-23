@@ -74,72 +74,74 @@ public interface AbstractElement {
     }
 
     JsonElement toJson();
-    default String toJsonString(boolean pretty){
-        if(pretty)
+
+    default String toJsonString(boolean pretty) {
+        if (pretty)
             return new GsonBuilder().setPrettyPrinting().create().toJson(toJson());
         return new Gson().toJson(toJson());
     }
-    default String toJsonString(){
+
+    default String toJsonString() {
         return toJsonString(false);
     }
 
     Object toAbstractObject();
 
-    default String toYaml(boolean pretty){
+    default String toYaml(boolean pretty) {
         Yaml yaml;
-        if(pretty){
+        if (pretty) {
             DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setPrettyFlow(true);
             yaml = new Yaml(options);
-        }else{
+        } else {
             yaml = new Yaml();
         }
         return yaml.dump(toAbstractObject());
     }
 
-    default String toYaml(){
+    default String toYaml() {
         return toYaml(true);
     }
 
-    static AbstractElement fromYaml(String source, boolean singleRoot){
+    static AbstractElement fromYaml(String source, boolean singleRoot) {
         Yaml yaml = new Yaml();
         Object object = yaml.load(source);
-        if(singleRoot && object instanceof List){
+        if (singleRoot && object instanceof List) {
             List<Object> list = (List<Object>) object;
-            if(list.size() == 0){
+            if (list.size() == 0) {
                 object = new HashMap<>();
-            }else{
+            } else {
                 object = list.get(0);
             }
         }
         return fromAbstractObject(object);
     }
 
-    static AbstractElement fromYaml(String source){
+    static AbstractElement fromYaml(String source) {
         return fromYaml(source, false);
     }
 
-    static AbstractElement fromAbstractObject(Object object){
-        if(object == null)
+    static AbstractElement fromAbstractObject(Object object) {
+        if (object == null)
             return AbstractNull.INSTANCE;
-        if(object instanceof List){
+        if (object instanceof List) {
             List<Object> list = (List<Object>) object;
             AbstractArray array = new AbstractArray();
             list.forEach(e -> array.add(fromAbstractObject(e)));
             return array;
         }
-        if(object instanceof Map){
+        if (object instanceof Map) {
             Map<String, Object> map = (Map<String, Object>) object;
             AbstractObject graphObject = new AbstractObject();
-            map.forEach((k,v) -> graphObject.set(k, fromAbstractObject(v)));
+            map.forEach((k, v) -> graphObject.set(k, fromAbstractObject(v)));
             return graphObject;
         }
-        if(object instanceof Number)
+        if (object instanceof Number)
             return new AbstractPrimitive((Number) object);
-        if(object instanceof String)
+        if (object instanceof String)
             return new AbstractPrimitive((String) object);
-        if(object instanceof Boolean)
+        if (object instanceof Boolean)
             return new AbstractPrimitive((Boolean) object);
         return AbstractNull.INSTANCE;
     }

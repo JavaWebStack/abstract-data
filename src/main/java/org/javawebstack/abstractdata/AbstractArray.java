@@ -1,6 +1,5 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -50,11 +49,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return this;
     }
 
-    public AbstractArray(){
+    public AbstractArray() {
         elements = new ArrayList<>();
     }
 
-    public AbstractArray(Object[] objects){
+    public AbstractArray(Object[] objects) {
         this();
         for (Object o : objects) {
             if (o instanceof AbstractElement)
@@ -64,7 +63,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         }
     }
 
-    public AbstractArray(Collection<Object> abstractElements){
+    public AbstractArray(Collection<Object> abstractElements) {
         this(abstractElements.toArray());
     }
 
@@ -94,8 +93,8 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return set(i, AbstractNull.INSTANCE);
     }
 
-    public AbstractArray set(int i, AbstractElement element){
-        if(element == null)
+    public AbstractArray set(int i, AbstractElement element) {
+        if (element == null)
             return setNull(i);
         while (elements.size() <= i)
             addNull();
@@ -103,38 +102,38 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return this;
     }
 
-    public AbstractArray set(int i, Number value){
-        if(value == null)
+    public AbstractArray set(int i, Number value) {
+        if (value == null)
             return setNull(i);
         return set(i, new AbstractPrimitive(value));
     }
 
-    public AbstractArray set(int i, Boolean value){
-        if(value == null)
+    public AbstractArray set(int i, Boolean value) {
+        if (value == null)
             return setNull(i);
         return set(i, new AbstractPrimitive(value));
     }
 
-    public AbstractArray set(int i, String value){
-        if(value == null)
+    public AbstractArray set(int i, String value) {
+        if (value == null)
             return setNull(i);
         return set(i, new AbstractPrimitive(value));
     }
 
-    public AbstractArray remove(int i){
+    public AbstractArray remove(int i) {
         elements.remove(i);
         return this;
     }
 
-    public AbstractElement[] toArray(){
+    public AbstractElement[] toArray() {
         return elements.toArray(new AbstractElement[0]);
     }
 
-    public AbstractElement get(int i){
+    public AbstractElement get(int i) {
         return elements.get(i);
     }
 
-    public Stream<AbstractElement> stream(){
+    public Stream<AbstractElement> stream() {
         return elements.stream();
     }
 
@@ -142,7 +141,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return elements.size();
     }
 
-    public boolean contains(Object o){
+    public boolean contains(Object o) {
         for (AbstractElement element : elements) {
             if (o instanceof AbstractElement ? ((AbstractElement) o).toAbstractObject().equals(element.toAbstractObject()) : element.toAbstractObject().equals(o))
                 return true;
@@ -171,18 +170,18 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return list;
     }
 
-    public static AbstractArray fromJson(JsonArray array){
+    public static AbstractArray fromJson(JsonArray array) {
         AbstractArray a = new AbstractArray();
         array.forEach(e -> a.add(AbstractElement.fromJson(e)));
         return a;
     }
 
 
-    public static AbstractArray fromArray(Object[] objects){
+    public static AbstractArray fromArray(Object[] objects) {
         return new AbstractArray(objects);
     }
 
-    public static AbstractArray fromList(Collection collection){
+    public static AbstractArray fromList(Collection collection) {
         return new AbstractArray(collection);
     }
 
@@ -190,14 +189,14 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return Type.ARRAY;
     }
 
-    public AbstractObject object(){
+    public AbstractObject object() {
         AbstractObject o = new AbstractObject();
-        for(int i=0; i<size(); i++)
+        for (int i = 0; i < size(); i++)
             o.set(String.valueOf(i), get(i));
         return o;
     }
 
-    public Map<String[], Object> toTree(){
+    public Map<String[], Object> toTree() {
         return object().toTree();
     }
 

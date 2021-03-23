@@ -1,6 +1,9 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.*;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import org.javawebstack.abstractdata.util.GsonAbstractDataAdapter;
 
@@ -11,7 +14,7 @@ public class AbstractMapper {
     private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private boolean exposeRequired = false;
 
-    public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy){
+    public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy) {
         this.namingPolicy = namingPolicy;
         gson = null;
         return this;
@@ -41,8 +44,8 @@ public class AbstractMapper {
         return dateFormat;
     }
 
-    private Gson gson(){
-        if(gson != null)
+    private Gson gson() {
+        if (gson != null)
             return gson;
         GsonBuilder builder = new GsonBuilder()
                 .registerTypeAdapter(AbstractElement.class, new GsonAbstractDataAdapter<>())
@@ -51,32 +54,34 @@ public class AbstractMapper {
                 .registerTypeAdapter(AbstractPrimitive.class, new GsonAbstractDataAdapter<>())
                 .registerTypeAdapter(AbstractNull.class, new GsonAbstractDataAdapter<>())
                 .setFieldNamingPolicy(namingPolicy.getGsonPolicy());
-        if(dateFormat != null)
+        if (dateFormat != null)
             builder.setDateFormat(dateFormat);
-        if(exposeRequired){
+        if (exposeRequired) {
             builder.excludeFieldsWithoutExposeAnnotation();
-        }else{
+        } else {
             builder.setExclusionStrategies(new ExclusionStrategy() {
                 public boolean shouldSkipField(FieldAttributes fieldAttributes) {
                     return fieldAttributes.getAnnotation(Expose.class) != null && !fieldAttributes.getAnnotation(Expose.class).serialize();
                 }
-                public boolean shouldSkipClass(Class<?> aClass) { return false;  }
+
+                public boolean shouldSkipClass(Class<?> aClass) {
+                    return false;
+                }
             });
         }
         gson = builder.create();
         return gson;
     }
 
-    public AbstractElement toAbstract(Object object){
+    public AbstractElement toAbstract(Object object) {
         return AbstractElement.fromJson(gson().toJsonTree(object));
     }
 
-    public <T> T fromAbstract(AbstractElement element, Class<T> type){
-        if(element == null)
+    public <T> T fromAbstract(AbstractElement element, Class<T> type) {
+        if (element == null)
             return null;
         return gson().fromJson(element.toJson(), type);
     }
-
 
 
 }
