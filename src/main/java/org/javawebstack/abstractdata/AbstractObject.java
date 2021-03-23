@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -65,6 +66,11 @@ public class AbstractObject implements AbstractElement {
         return entries.get(key);
     }
 
+    public AbstractElement get(String key, AbstractElement orElse) {
+        AbstractElement value = get(key);
+        return (has(key) && !value.isNull()) ? value : orElse;
+    }
+
     public boolean has(String key){
         return entries.containsKey(key);
     }
@@ -87,24 +93,48 @@ public class AbstractObject implements AbstractElement {
         return get(key).object();
     }
 
+    public AbstractObject object(String key, AbstractObject orElse) {
+        return get(key, orElse).object();
+    }
+
     public AbstractArray array(String key) {
         return get(key).array();
+    }
+
+    public AbstractArray array(String key, AbstractArray orElse) {
+        return get(key, orElse).array();
     }
 
     public AbstractPrimitive primitive(String key) {
         return get(key).primitive();
     }
 
+    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
+        return get(key, orElse).primitive();
+    }
+
     public String string(String key) {
         return get(key).string();
+    }
+
+    public String string(String key, String orElse) {
+        return get(key, new AbstractPrimitive(orElse)).string();
     }
 
     public Boolean bool(String key) {
         return get(key).bool();
     }
 
+    public Boolean bool(String key, Boolean orElse) {
+        return get(key, new AbstractPrimitive(orElse)).bool();
+    }
+
     public Number number(String key) {
         return get(key).number();
+    }
+
+    public Number number(String key, Number orElse) {
+        return get(key, new AbstractPrimitive(orElse)).number();
     }
 
     public JsonElement toJson() {
