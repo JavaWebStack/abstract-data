@@ -53,7 +53,8 @@ public class AbstractMapper {
                 .registerTypeAdapter(AbstractArray.class, new GsonAbstractDataAdapter<>())
                 .registerTypeAdapter(AbstractPrimitive.class, new GsonAbstractDataAdapter<>())
                 .registerTypeAdapter(AbstractNull.class, new GsonAbstractDataAdapter<>())
-                .setFieldNamingPolicy(namingPolicy.getGsonPolicy());
+                .setFieldNamingPolicy(namingPolicy.getGsonPolicy())
+                .disableHtmlEscaping();
         if (dateFormat != null)
             builder.setDateFormat(dateFormat);
         if (exposeRequired) {
