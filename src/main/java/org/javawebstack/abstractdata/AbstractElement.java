@@ -77,7 +77,7 @@ public interface AbstractElement {
 
     default String toJsonString(boolean pretty) {
         if (pretty)
-            return new GsonBuilder().setPrettyPrinting().create().toJson(toJson());
+            return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(toJson());
         return new Gson().toJson(toJson());
     }
 
