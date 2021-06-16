@@ -70,6 +70,18 @@ public class AbstractObject implements AbstractElement {
         return (has(key) && !value.isNull()) ? value : orElse;
     }
 
+    public AbstractElement query(String query) {
+        String[] q = query.split("\\.", 2);
+        AbstractElement e = get(q[0]);
+        if(e == null || q.length == 1)
+            return e;
+        if(e.isObject())
+            return e.object().query(q[1]);
+        if(e.isArray())
+            return e.array().query(q[1]);
+        return null;
+    }
+
     public boolean has(String key) {
         return entries.containsKey(key);
     }

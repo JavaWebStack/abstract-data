@@ -133,6 +133,28 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return elements.get(i);
     }
 
+    public AbstractElement get(int index, AbstractElement orElse) {
+        AbstractElement value = get(index);
+        return (index >= 0 && index < size() && !value.isNull()) ? value : orElse;
+    }
+
+    public AbstractElement query(String query) {
+        String[] q = query.split("\\.", 2);
+        try {
+            int index = Integer.parseInt(q[0]);
+            AbstractElement e = get(index);
+            if(e == null || q.length == 1)
+                return e;
+            if(e.isObject())
+                return e.object().query(q[1]);
+            if(e.isArray())
+                return e.array().query(q[1]);
+            return null;
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+    }
+
     public Stream<AbstractElement> stream() {
         return elements.stream();
     }
