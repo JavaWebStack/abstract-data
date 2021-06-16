@@ -82,6 +82,11 @@ public class AbstractObject implements AbstractElement {
         return null;
     }
 
+    public AbstractElement query(String query, AbstractElement orElse) {
+        AbstractElement value = query(query);
+        return (value != null && !value.isNull()) ? value : orElse;
+    }
+
     public boolean has(String key) {
         return entries.containsKey(key);
     }
@@ -101,51 +106,51 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractObject object(String key) {
-        return get(key).object();
+        return query(key).object();
     }
 
     public AbstractObject object(String key, AbstractObject orElse) {
-        return get(key, orElse).object();
+        return query(key, orElse).object();
     }
 
     public AbstractArray array(String key) {
-        return get(key).array();
+        return query(key).array();
     }
 
     public AbstractArray array(String key, AbstractArray orElse) {
-        return get(key, orElse).array();
+        return query(key, orElse).array();
     }
 
     public AbstractPrimitive primitive(String key) {
-        return get(key).primitive();
+        return query(key).primitive();
     }
 
     public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
-        return get(key, orElse).primitive();
+        return query(key, orElse).primitive();
     }
 
     public String string(String key) {
-        return get(key).string();
+        return query(key).string();
     }
 
     public String string(String key, String orElse) {
-        return get(key, new AbstractPrimitive(orElse)).string();
+        return query(key, new AbstractPrimitive(orElse)).string();
     }
 
     public Boolean bool(String key) {
-        return get(key).bool();
+        return query(key).bool();
     }
 
     public Boolean bool(String key, Boolean orElse) {
-        return get(key, new AbstractPrimitive(orElse)).bool();
+        return query(key, new AbstractPrimitive(orElse)).bool();
     }
 
     public Number number(String key) {
-        return get(key).number();
+        return query(key).number();
     }
 
     public Number number(String key, Number orElse) {
-        return get(key, new AbstractPrimitive(orElse)).number();
+        return query(key, new AbstractPrimitive(orElse)).number();
     }
 
     public JsonElement toJson() {

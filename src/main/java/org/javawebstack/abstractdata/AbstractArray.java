@@ -18,6 +18,54 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return this;
     }
 
+    public AbstractObject object(String key) {
+        return query(key).object();
+    }
+
+    public AbstractArray array(String key) {
+        return query(key).array();
+    }
+
+    public AbstractPrimitive primitive(String key) {
+        return query(key).primitive();
+    }
+
+    public String string(String key) {
+        return query(key).string();
+    }
+
+    public Boolean bool(String key) {
+        return query(key).bool();
+    }
+
+    public Number number(String key) {
+        return query(key).number();
+    }
+
+    public AbstractObject object(String key, AbstractObject orElse) {
+        return query(key, orElse).object();
+    }
+
+    public AbstractArray array(String key, AbstractArray orElse) {
+        return query(key, orElse).array();
+    }
+
+    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
+        return query(key, orElse).primitive();
+    }
+
+    public String string(String key, String orElse) {
+        return query(key, new AbstractPrimitive(orElse)).string();
+    }
+
+    public Boolean bool(String key, Boolean orElse) {
+        return query(key, new AbstractPrimitive(orElse)).bool();
+    }
+
+    public Number number(String key, Number orElse) {
+        return query(key, new AbstractPrimitive(orElse)).number();
+    }
+
     public AbstractObject object(int index) {
         return get(index).object();
     }
@@ -40,6 +88,30 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public Number number(int index) {
         return get(index).number();
+    }
+
+    public AbstractObject object(int index, AbstractObject orElse) {
+        return get(index, orElse).object();
+    }
+
+    public AbstractArray array(int index, AbstractArray orElse) {
+        return get(index, orElse).array();
+    }
+
+    public AbstractPrimitive primitive(int index, AbstractPrimitive orElse) {
+        return get(index, orElse).primitive();
+    }
+
+    public String string(int index, String orElse) {
+        return get(index, new AbstractPrimitive(orElse)).string();
+    }
+
+    public Boolean bool(int index, Boolean orElse) {
+        return get(index, new AbstractPrimitive(orElse)).bool();
+    }
+
+    public Number number(int index, Number orElse) {
+        return get(index, new AbstractPrimitive(orElse)).number();
     }
 
     public AbstractArray add(AbstractElement element) {
@@ -153,6 +225,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         } catch (NumberFormatException nfe) {
             return null;
         }
+    }
+
+    public AbstractElement query(String query, AbstractElement orElse) {
+        AbstractElement value = query(query);
+        return (value != null && !value.isNull()) ? value : orElse;
     }
 
     public Stream<AbstractElement> stream() {
