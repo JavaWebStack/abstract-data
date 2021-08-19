@@ -6,17 +6,19 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class GsonMapDeserializer<T> implements JsonDeserializer<Map<String, T>> {
-    protected abstract Class<T> getType();
+public abstract class GsonMapDeserializer<K,V> implements JsonDeserializer<Map<K, V>> {
 
-    public Map<String, T> deserialize(JsonElement json, Type type, JsonDeserializationContext deserializationContext) throws JsonParseException {
+    protected abstract Class<K> getKeyType();
+    protected abstract Class<V> getValueType();
+
+    public Map<K, V> deserialize(JsonElement json, Type type, JsonDeserializationContext deserializationContext) throws JsonParseException {
         if (json == null || !json.isJsonObject())
             return null;
         JsonObject jsonObject = json.getAsJsonObject();
-        Map<String, T> map = new HashMap<>();
-        Class<?> t = getType();
+        Map<K, V> map = new HashMap<>();
+        Class<?> t = getValueType();
         for (String k : jsonObject.keySet())
-            map.put(k, deserializationContext.deserialize(jsonObject.get(k), t));
+            map.put(deserializationContext.deserialize(new JsonPrimitive(k), getKeyType()), deserializationContext.deserialize(jsonObject.get(k), t));
         return map;
     }
 }
