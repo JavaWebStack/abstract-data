@@ -7,12 +7,12 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <releaseVersion>1.0.0-SNAPSHOT</releaseVersion>
+        <buildVersion>1.0.0-SNAPSHOT</buildVersion>
     </properties>
 
     <groupId>org.javawebstack</groupId>
     <artifactId>abstract-data</artifactId>
-    <version>${releaseVersion}</version>
+    <version>${buildVersion}</version>
 
     <name>abstract-data</name>
     <description>A library to abstractly represent structured data and convert it from and to several formats</description>
