@@ -12,7 +12,7 @@ jobs:
       - name: Build
         run: mvn -B package --file pom.xml
       - name: Install GPG Key
-        run: echo -e "$GPG_PRIVATE_KEY" > gpgkey.asc && gpg --import gpgkey.asc && rm gpgkey.asc
+        run: echo -e "$GPG_PRIVATE_KEY" | gpg --import --no-tty --batch --yes
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       - name: Deploy to JavaWebStack Repository
