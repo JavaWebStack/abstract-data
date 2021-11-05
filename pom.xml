@@ -4,9 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <releaseVersion>1.0.0-SNAPSHOT</releaseVersion>
+    </properties>
+
     <groupId>org.javawebstack</groupId>
     <artifactId>abstract-data</artifactId>
-    <version>{{ releaseVersion }}</version>
+    <version>${releaseVersion}</version>
 
     <name>abstract-data</name>
     <description>A library to abstractly represent structured data and convert it from and to several formats</description>
@@ -33,12 +39,6 @@
         <developerConnection>scm:git:ssh://github.com:JavaWebStack/abstract-data.git</developerConnection>
         <url>https://github.com/JavaWebStack/abstract-data/tree/master</url>
     </scm>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <releaseVersion>1.0.0-SNAPSHOT</releaseVersion>
-    </properties>
 
     <dependencies>
         <dependency>
