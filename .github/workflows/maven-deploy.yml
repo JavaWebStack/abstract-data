@@ -15,7 +15,7 @@ jobs:
         run: echo -e "$GPG_PRIVATE_KEY" | gpg --import --no-tty --batch --yes
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-      - name: Deploy to JavaWebStack Repository
+      - name: Deploy to OSSRH Repository
         run: mvn deploy -s build/settings.xml
         env:
           DEPLOYMENT_USERNAME: ${{ secrets.DEPLOYMENT_USERNAME }}
