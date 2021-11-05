@@ -3,11 +3,11 @@
 JWS Abstract Data Representation
 </p>
 
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/JavaWebStack/AbstractData/Maven%20Deploy/master)
-![GitHub](https://img.shields.io/github/license/JavaWebStack/AbstractData)
-![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.javawebstack.org%2Forg%2Fjavawebstack%2FAbstractData%2Fmaven-metadata.xml)
-![GitHub contributors](https://img.shields.io/github/contributors/JavaWebStack/AbstractData)
-![Lines of code](https://img.shields.io/tokei/lines/github/JavaWebStack/AbstractData)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/JavaWebStack/abstract-data/Maven%20Deploy/master)
+![GitHub](https://img.shields.io/github/license/JavaWebStack/abstract-data)
+![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.javawebstack.org%2Forg%2Fjavawebstack%2Fabstract-data%2Fmaven-metadata.xml)
+![GitHub contributors](https://img.shields.io/github/contributors/JavaWebStack/abstract-data)
+![Lines of code](https://img.shields.io/tokei/lines/github/JavaWebStack/abstract-data)
 ![Discord](https://img.shields.io/discord/815612319378833408?color=%237289DA&label=discord)
 ![Twitter Follow](https://img.shields.io/twitter/follow/JavaWebStack?style=social)
 
