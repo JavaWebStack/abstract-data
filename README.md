@@ -16,3 +16,12 @@ A library to abstractly represent structured data and convert it from and to sev
 
 ## Documentation
 You can find the current docs on our [website](https://docs.javawebstack.org/framework). This is a work-in-progress project though so it's not yet complete.
+
+## Maven
+```xml
+<dependency>
+    <groupId>org.javawebstack</groupId>
+    <artifactId>abstract-data</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
