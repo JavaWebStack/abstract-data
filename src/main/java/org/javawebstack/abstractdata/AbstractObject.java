@@ -5,13 +5,14 @@ import com.google.gson.JsonObject;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class AbstractObject implements AbstractElement {
 
-    private final Map<String, AbstractElement> entries = new HashMap<>();
+    private final Map<String, AbstractElement> entries = new LinkedHashMap<>();
 
     public AbstractObject setNull(String key) {
         set(key, AbstractNull.INSTANCE);

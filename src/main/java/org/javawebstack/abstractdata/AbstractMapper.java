@@ -5,11 +5,16 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import org.javawebstack.abstractdata.mapper.Mapper;
 import org.javawebstack.abstractdata.util.GsonAbstractDataAdapter;
 
 public class AbstractMapper {
 
+    // This allows
+    public static boolean enableExperimentalMapper = false;
+
     private Gson gson;
+    private final Mapper mapper = new Mapper();
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private boolean exposeRequired = false;
@@ -17,6 +22,7 @@ public class AbstractMapper {
     public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy) {
         this.namingPolicy = namingPolicy;
         gson = null;
+        mapper.namingPolicy(namingPolicy.getMapperPolicy());
         return this;
     }
 
@@ -27,6 +33,7 @@ public class AbstractMapper {
     public AbstractMapper setExposeRequired(boolean exposeRequired) {
         this.exposeRequired = exposeRequired;
         gson = null;
+        mapper.requireExpose(exposeRequired);
         return this;
     }
 
@@ -37,6 +44,7 @@ public class AbstractMapper {
     public AbstractMapper setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
         gson = null;
+        mapper.dateFormat(dateFormat);
         return this;
     }
 
@@ -75,12 +83,16 @@ public class AbstractMapper {
     }
 
     public AbstractElement toAbstract(Object object) {
+        if(enableExperimentalMapper)
+            return mapper.map(object);
         return AbstractElement.fromJson(gson().toJsonTree(object));
     }
 
     public <T> T fromAbstract(AbstractElement element, Class<T> type) {
         if (element == null)
             return null;
+        if(enableExperimentalMapper)
+            return mapper.map(element, type);
         return gson().fromJson(element.toJson(), type);
     }
 
