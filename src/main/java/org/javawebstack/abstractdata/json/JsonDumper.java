@@ -107,6 +107,9 @@ public class JsonDumper {
                 case '/':
                     sb.append("\\/");
                     break;
+                case '\0':
+                    sb.append("\\0");
+                    break;
                 default:
                     if (ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000' && ch <= '\u20FF') {
                         String hex = Integer.toHexString(ch);

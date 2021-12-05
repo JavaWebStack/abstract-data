@@ -11,6 +11,10 @@ public class AbstractObject implements AbstractElement {
 
     private final Map<String, AbstractElement> entries = new LinkedHashMap<>();
 
+    public Set<Map.Entry<String, AbstractElement>> entries() {
+        return entries.entrySet();
+    }
+
     public AbstractObject setNull(String key) {
         set(key, AbstractNull.INSTANCE);
         return this;
