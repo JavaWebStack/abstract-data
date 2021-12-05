@@ -1,8 +1,5 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,11 +14,7 @@ public class AbstractNull implements AbstractElement {
         return true;
     }
 
-    public JsonElement toJson() {
-        return JsonNull.INSTANCE;
-    }
-
-    public Object toAbstractObject() {
+    public Object toObject() {
         return null;
     }
 

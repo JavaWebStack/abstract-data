@@ -1,8 +1,5 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,17 +56,7 @@ public class AbstractPrimitive implements AbstractElement {
         return value;
     }
 
-    public JsonElement toJson() {
-        if (isString())
-            return new JsonPrimitive(string());
-        if (isBoolean())
-            return new JsonPrimitive(bool());
-        if (isNumber())
-            return new JsonPrimitive(number());
-        return null;
-    }
-
-    public Object toAbstractObject() {
+    public Object toObject() {
         return value;
     }
 
@@ -77,16 +64,6 @@ public class AbstractPrimitive implements AbstractElement {
         Map<String[], Object> tree = new HashMap<>();
         tree.put(new String[0], value);
         return tree;
-    }
-
-    public static AbstractPrimitive fromJson(JsonPrimitive primitive) {
-        if (primitive == null)
-            return null;
-        if (primitive.isNumber())
-            return new AbstractPrimitive(primitive.getAsNumber());
-        if (primitive.isBoolean())
-            return new AbstractPrimitive(primitive.getAsBoolean());
-        return new AbstractPrimitive(primitive.getAsString());
     }
 
     public static AbstractPrimitive from(Object object) {
