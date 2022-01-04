@@ -6,6 +6,7 @@ import org.javawebstack.abstractdata.mapper.exception.MapperWrongTypeException;
 import org.javawebstack.abstractdata.util.Helpers;
 
 import java.sql.Timestamp;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -45,6 +46,7 @@ public final class DefaultMappers {
         map.put(double.class, PRIMITIVE);
         map.put(Boolean.class, PRIMITIVE);
         map.put(boolean.class, PRIMITIVE);
+        map.put(Number.class, PRIMITIVE);
         map.put(Map.class, MAP);
         map.put(HashMap.class, MAP);
         map.put(LinkedHashMap.class, MAP);
@@ -117,6 +119,8 @@ public final class DefaultMappers {
                     return element.number().floatValue();
                 if(type.equals(byte.class) || type.equals(Byte.class))
                     return element.number().byteValue();
+                if(type.equals(Number.class))
+                    return element.number();
                 return element.number();
             }
             throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
