@@ -98,6 +98,7 @@ public class MapperTypeSpec {
     }
 
     public Field getAdditionalField() {
+        additionalField.setAccessible(true);
         return additionalField;
     }
 
@@ -112,6 +113,7 @@ public class MapperTypeSpec {
         private Map<Class<? extends Annotation>, List<Annotation>> annotations = new HashMap<>();
 
         public Field getField() {
+            field.setAccessible(true);
             return field;
         }
 
