@@ -98,7 +98,8 @@ public class MapperTypeSpec {
     }
 
     public Field getAdditionalField() {
-        additionalField.setAccessible(true);
+        if(additionalField != null)
+            additionalField.setAccessible(true);
         return additionalField;
     }
 
