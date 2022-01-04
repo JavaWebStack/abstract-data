@@ -1,20 +1,21 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.FieldNamingPolicy;
-
 public enum NamingPolicy {
-    NONE(FieldNamingPolicy.IDENTITY),
-    CAMEL_CASE(FieldNamingPolicy.IDENTITY),
-    PASCAL_CASE(FieldNamingPolicy.UPPER_CAMEL_CASE),
-    SNAKE_CASE(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES),
-    KEBAB_CASE(FieldNamingPolicy.LOWER_CASE_WITH_DASHES);
-    private final FieldNamingPolicy policy;
+    
+    NONE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.NONE),
+    CAMEL_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.CAMEL_CASE),
+    PASCAL_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.PASCAL_CASE),
+    SNAKE_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.SNAKE_CASE),
+    KEBAB_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.KEBAB_CASE);
 
-    NamingPolicy(FieldNamingPolicy policy) {
-        this.policy = policy;
+    private final org.javawebstack.abstractdata.mapper.naming.NamingPolicy mapperPolicy;
+
+    NamingPolicy(org.javawebstack.abstractdata.mapper.naming.NamingPolicy mapperPolicy) {
+        this.mapperPolicy = mapperPolicy;
     }
 
-    public FieldNamingPolicy getGsonPolicy() {
-        return policy;
+    public org.javawebstack.abstractdata.mapper.naming.NamingPolicy getMapperPolicy() {
+        return mapperPolicy;
     }
+
 }

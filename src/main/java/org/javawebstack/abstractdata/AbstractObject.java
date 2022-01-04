@@ -1,17 +1,19 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
 public class AbstractObject implements AbstractElement {
 
-    private final Map<String, AbstractElement> entries = new HashMap<>();
+    private final Map<String, AbstractElement> entries = new LinkedHashMap<>();
+
+    public Set<Map.Entry<String, AbstractElement>> entries() {
+        return entries.entrySet();
+    }
 
     public AbstractObject setNull(String key) {
         set(key, AbstractNull.INSTANCE);
@@ -153,22 +155,10 @@ public class AbstractObject implements AbstractElement {
         return query(key, new AbstractPrimitive(orElse)).number();
     }
 
-    public JsonElement toJson() {
-        JsonObject object = new JsonObject();
-        entries.forEach((k, v) -> object.add(k, v.toJson()));
-        return object;
-    }
-
-    public Object toAbstractObject() {
+    public Object toObject() {
         Map<String, Object> map = new HashMap<>();
-        forEach((k, v) -> map.put(k, v.toAbstractObject()));
+        forEach((k, v) -> map.put(k, v.toObject()));
         return map;
-    }
-
-    public static AbstractObject fromJson(JsonObject object) {
-        AbstractObject o = new AbstractObject();
-        object.entrySet().stream().map(Map.Entry::getKey).forEach(k -> o.set(k, AbstractElement.fromJson(object.get(k))));
-        return o;
     }
 
     public Type getType() {
@@ -188,7 +178,7 @@ public class AbstractObject implements AbstractElement {
                 field.setAccessible(true);
 
                 try {
-                    field.set(object, get(field.getName()).toAbstractObject());
+                    field.set(object, get(field.getName()).toObject());
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

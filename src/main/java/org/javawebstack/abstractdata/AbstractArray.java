@@ -1,8 +1,5 @@
 package org.javawebstack.abstractdata;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -242,7 +239,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public boolean contains(Object o) {
         for (AbstractElement element : elements) {
-            if (o instanceof AbstractElement ? ((AbstractElement) o).toAbstractObject().equals(element.toAbstractObject()) : element.toAbstractObject().equals(o))
+            if (o instanceof AbstractElement ? ((AbstractElement) o).toObject().equals(element.toObject()) : element.toObject().equals(o))
                 return true;
         }
         return false;
@@ -257,24 +254,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return elements.iterator();
     }
 
-    public JsonElement toJson() {
-        JsonArray array = new JsonArray();
-        elements.forEach(e -> array.add(e.toJson()));
-        return array;
-    }
-
-    public Object toAbstractObject() {
+    public Object toObject() {
         List<Object> list = new ArrayList<>();
-        elements.forEach(e -> list.add(e.toAbstractObject()));
+        elements.forEach(e -> list.add(e.toObject()));
         return list;
     }
-
-    public static AbstractArray fromJson(JsonArray array) {
-        AbstractArray a = new AbstractArray();
-        array.forEach(e -> a.add(AbstractElement.fromJson(e)));
-        return a;
-    }
-
 
     public static AbstractArray fromArray(Object[] objects) {
         return new AbstractArray(objects);
