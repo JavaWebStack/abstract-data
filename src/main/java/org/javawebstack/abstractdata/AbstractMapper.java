@@ -1,17 +1,22 @@
 package org.javawebstack.abstractdata;
 
-import org.javawebstack.abstractdata.mapper.Mapper;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
+import org.javawebstack.abstractdata.util.GsonAbstractDataAdapter;
 
 public class AbstractMapper {
 
-    private final Mapper mapper = new Mapper();
+    private Gson gson;
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private boolean exposeRequired = false;
 
     public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy) {
         this.namingPolicy = namingPolicy;
-        mapper.namingPolicy(namingPolicy.getMapperPolicy());
+        gson = null;
         return this;
     }
 
@@ -21,7 +26,7 @@ public class AbstractMapper {
 
     public AbstractMapper setExposeRequired(boolean exposeRequired) {
         this.exposeRequired = exposeRequired;
-        mapper.requireExpose(exposeRequired);
+        gson = null;
         return this;
     }
 
@@ -31,7 +36,7 @@ public class AbstractMapper {
 
     public AbstractMapper setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
-        mapper.dateFormat(dateFormat);
+        gson = null;
         return this;
     }
 
@@ -39,14 +44,44 @@ public class AbstractMapper {
         return dateFormat;
     }
 
+    private Gson gson() {
+        if (gson != null)
+            return gson;
+        GsonBuilder builder = new GsonBuilder()
+                .registerTypeAdapter(AbstractElement.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractObject.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractArray.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractPrimitive.class, new GsonAbstractDataAdapter<>())
+                .registerTypeAdapter(AbstractNull.class, new GsonAbstractDataAdapter<>())
+                .setFieldNamingPolicy(namingPolicy.getGsonPolicy())
+                .disableHtmlEscaping();
+        if (dateFormat != null)
+            builder.setDateFormat(dateFormat);
+        if (exposeRequired) {
+            builder.excludeFieldsWithoutExposeAnnotation();
+        } else {
+            builder.setExclusionStrategies(new ExclusionStrategy() {
+                public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                    return fieldAttributes.getAnnotation(Expose.class) != null && !fieldAttributes.getAnnotation(Expose.class).serialize();
+                }
+
+                public boolean shouldSkipClass(Class<?> aClass) {
+                    return false;
+                }
+            });
+        }
+        gson = builder.create();
+        return gson;
+    }
+
     public AbstractElement toAbstract(Object object) {
-        return mapper.map(object);
+        return AbstractElement.fromJson(gson().toJsonTree(object));
     }
 
     public <T> T fromAbstract(AbstractElement element, Class<T> type) {
         if (element == null)
             return null;
-        return mapper.map(element, type);
+        return gson().fromJson(element.toJson(), type);
     }
 
 

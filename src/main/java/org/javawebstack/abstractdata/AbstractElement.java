@@ -1,12 +1,12 @@
 package org.javawebstack.abstractdata;
 
-import org.javawebstack.abstractdata.json.JsonDumper;
-import org.javawebstack.abstractdata.json.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.javawebstack.abstractdata.util.QueryString;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,15 +73,19 @@ public interface AbstractElement {
         return primitive().number();
     }
 
+    JsonElement toJson();
+
     default String toJsonString(boolean pretty) {
-        return new JsonDumper().setPretty(pretty).dump(this);
+        if (pretty)
+            return new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(toJson());
+        return new GsonBuilder().disableHtmlEscaping().create().toJson(toJson());
     }
 
     default String toJsonString() {
         return toJsonString(false);
     }
 
-    Object toObject();
+    Object toAbstractObject();
 
     default String toYaml(boolean pretty) {
         Yaml yaml;
@@ -93,7 +97,7 @@ public interface AbstractElement {
         } else {
             yaml = new Yaml();
         }
-        return yaml.dump(toObject());
+        return yaml.dump(toAbstractObject());
     }
 
     default String toYaml() {
@@ -158,13 +162,20 @@ public interface AbstractElement {
 
     Map<String[], Object> toTree();
 
-    static AbstractElement fromJson(String json) {
-        try {
-            return new JsonParser().parse(json);
-        } catch (ParseException e) {
-            e.printStackTrace();
+    static AbstractElement fromJson(JsonElement element) {
+        if (element == null)
             return null;
-        }
+        if (element.isJsonArray())
+            return AbstractArray.fromJson(element.getAsJsonArray());
+        if (element.isJsonObject())
+            return AbstractObject.fromJson(element.getAsJsonObject());
+        if (element.isJsonPrimitive())
+            return AbstractPrimitive.fromJson(element.getAsJsonPrimitive());
+        return AbstractNull.INSTANCE;
+    }
+
+    static AbstractElement fromJson(String json) {
+        return fromJson(new GsonBuilder().create().fromJson(json, JsonElement.class));
     }
 
     static AbstractElement fromTree(Map<String[], Object> tree) {
