@@ -82,7 +82,7 @@ public class QueryString {
     }
 
     public String toString() {
-        return map.entrySet().stream().map(e -> e.getKey() + "=" + urlEncode(e.getValue())).collect(Collectors.joining("&"));
+        return map.entrySet().stream().map(e -> urlEncode(e.getKey()) + "=" + urlEncode(e.getValue())).collect(Collectors.joining("&"));
     }
 
     private static Map<String, String> parseQuery(String query) {
@@ -93,7 +93,7 @@ public class QueryString {
                 if (part.length() == 0)
                     continue;
                 String[] spl = part.split("=");
-                map.put(spl[0], spl.length > 1 ? urlDecode(spl[1]) : "");
+                map.put(urlDecode(spl[0]), spl.length > 1 ? urlDecode(spl[1]) : "");
             }
         }
         return map;
