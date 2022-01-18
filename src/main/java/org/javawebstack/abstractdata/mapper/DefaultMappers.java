@@ -90,6 +90,8 @@ public final class DefaultMappers {
         public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
             if(value instanceof String)
                 return new AbstractPrimitive((String) value);
+            if(value instanceof Boolean)
+                return new AbstractPrimitive((Boolean) value);
             return new AbstractPrimitive((Number) value);
         }
 
