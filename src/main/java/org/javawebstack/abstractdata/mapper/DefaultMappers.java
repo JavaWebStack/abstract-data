@@ -5,6 +5,8 @@ import org.javawebstack.abstractdata.mapper.exception.MapperException;
 import org.javawebstack.abstractdata.mapper.exception.MapperWrongTypeException;
 import org.javawebstack.abstractdata.util.Helpers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -303,7 +305,9 @@ public final class DefaultMappers {
                 throw new MapperException("Unmappable type '" + type.getName() + "'");
             AbstractObject o = element.object();
             try {
-                Object obj = type.newInstance();
+                Constructor constructor = type.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Object obj = constructor.newInstance();
                 AbstractObject additional = spec.getAdditionalField() == null ? null : new AbstractObject();
                 List<String> fieldNames = spec.getFieldSpecs().stream().map(s -> s.getField().getName()).collect(Collectors.toList());
                 for(String k : o.keys()) {
@@ -330,7 +334,7 @@ public final class DefaultMappers {
                 if(additional != null)
                     spec.getAdditionalField().set(obj, additional);
                 return obj;
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new MapperException(e.getMessage());
             }
         }
