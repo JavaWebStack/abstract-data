@@ -162,8 +162,7 @@ public interface AbstractElement {
         try {
             return new JsonParser().parse(json);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
