@@ -266,6 +266,8 @@ public final class DefaultMappers {
         public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
             if(value.getClass().isEnum())
                 return new AbstractPrimitive(((Enum<?>) value).name());
+            if(value.getClass().equals(UUID.class))
+                return new AbstractPrimitive(value.toString());
             MapperTypeSpec spec = MapperTypeSpec.get(value.getClass());
             if(spec == null)
                 throw new MapperException("Unmappable type '" + value.getClass().getName() + "'");
@@ -298,6 +300,8 @@ public final class DefaultMappers {
                     throw new MapperException("There is no enum constant '" + element.string() + "'");
                 }
             }
+            if(type.equals(UUID.class))
+                return UUID.fromString(element.string());
             if(!element.isObject())
                 throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
             MapperTypeSpec spec = MapperTypeSpec.get(type);
