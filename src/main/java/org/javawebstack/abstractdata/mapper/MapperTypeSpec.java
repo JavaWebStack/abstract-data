@@ -7,6 +7,7 @@ import org.javawebstack.abstractdata.mapper.exception.MapperException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class MapperTypeSpec {
@@ -85,7 +86,7 @@ public class MapperTypeSpec {
             }
             spec.order = options.order();
             spec.expose = options.expose();
-            spec.hidden = options.hidden();
+            spec.hidden = options.hidden() || Modifier.isTransient(field.getModifiers());
         }
     }
 
