@@ -2,16 +2,25 @@ package org.javawebstack.abstractdata;
 
 import org.javawebstack.abstractdata.mapper.Mapper;
 
+@Deprecated
 public class AbstractMapper {
 
     private final Mapper mapper = new Mapper();
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private String dateFormat = "yyyy-MM-dd HH:mm:ss";
-    private boolean exposeRequired = false;
 
     public AbstractMapper setNamingPolicy(NamingPolicy namingPolicy) {
         this.namingPolicy = namingPolicy;
         mapper.namingPolicy(namingPolicy.getMapperPolicy());
+        return this;
+    }
+
+    public boolean shouldOmitNull() {
+        return mapper.shouldOmitNull();
+    }
+
+    public AbstractMapper setOmitNull(boolean omitNull) {
+        this.mapper.omitNull(omitNull);
         return this;
     }
 
@@ -20,13 +29,12 @@ public class AbstractMapper {
     }
 
     public AbstractMapper setExposeRequired(boolean exposeRequired) {
-        this.exposeRequired = exposeRequired;
         mapper.requireExpose(exposeRequired);
         return this;
     }
 
     public boolean isExposeRequired() {
-        return exposeRequired;
+        return mapper.isExposeRequired();
     }
 
     public AbstractMapper setDateFormat(String dateFormat) {

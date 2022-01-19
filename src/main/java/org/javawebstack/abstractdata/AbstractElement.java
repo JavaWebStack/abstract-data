@@ -1,5 +1,8 @@
 package org.javawebstack.abstractdata;
 
+import org.bson.BsonValue;
+import org.javawebstack.abstractdata.bson.BsonConverter;
+import org.javawebstack.abstractdata.bson.BsonTypeAdapter;
 import org.javawebstack.abstractdata.json.JsonDumper;
 import org.javawebstack.abstractdata.json.JsonParser;
 import org.javawebstack.abstractdata.util.QueryString;
@@ -71,6 +74,14 @@ public interface AbstractElement {
         if (!isNumber())
             return null;
         return primitive().number();
+    }
+
+    default BsonValue toBson() {
+        return new BsonConverter().toBson(this);
+    }
+
+    default byte[] toBsonBytes() {
+        return (byte[]) new BsonTypeAdapter().fromAbstract(null, this, byte[].class);
     }
 
     default String toJsonString(boolean pretty) {
@@ -154,6 +165,14 @@ public interface AbstractElement {
         return toFormData().toString();
     }
 
+    static AbstractElement fromBson(BsonValue value) {
+        return new BsonConverter().toAbstract(value);
+    }
+
+    static AbstractElement fromBson(byte[] value) {
+        return new BsonTypeAdapter().toAbstract(null, value);
+    }
+
     AbstractElement clone();
 
     Map<String[], Object> toTree();
@@ -162,8 +181,7 @@ public interface AbstractElement {
         try {
             return new JsonParser().parse(json);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -212,4 +230,5 @@ public interface AbstractElement {
             return this == NUMBER || this == BOOLEAN || this == STRING;
         }
     }
+
 }

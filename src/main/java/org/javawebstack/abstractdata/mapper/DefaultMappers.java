@@ -5,6 +5,8 @@ import org.javawebstack.abstractdata.mapper.exception.MapperException;
 import org.javawebstack.abstractdata.mapper.exception.MapperWrongTypeException;
 import org.javawebstack.abstractdata.util.Helpers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.*;
@@ -24,59 +26,16 @@ public final class DefaultMappers {
     public static Map<Class<?>, MapperTypeAdapter> create() {
         Map<Class<?>, MapperTypeAdapter> map = new HashMap<>();
 
-        // Abstract
-        map.put(AbstractElement.class, ABSTRACT);
-        map.put(AbstractNull.class, ABSTRACT);
-        map.put(AbstractPrimitive.class, ABSTRACT);
-        map.put(AbstractObject.class, ABSTRACT);
-        map.put(AbstractArray.class, ABSTRACT);
-
-        // Primitives
-        map.put(String.class, PRIMITIVE);
-        map.put(Integer.class, PRIMITIVE);
-        map.put(int.class, PRIMITIVE);
-        map.put(Long.class, PRIMITIVE);
-        map.put(long.class, PRIMITIVE);
-        map.put(Short.class, PRIMITIVE);
-        map.put(short.class, PRIMITIVE);
-        map.put(Float.class, PRIMITIVE);
-        map.put(float.class, PRIMITIVE);
-        map.put(Double.class, PRIMITIVE);
-        map.put(double.class, PRIMITIVE);
-        map.put(Boolean.class, PRIMITIVE);
-        map.put(boolean.class, PRIMITIVE);
-        map.put(Map.class, MAP);
-        map.put(HashMap.class, MAP);
-        map.put(LinkedHashMap.class, MAP);
-        map.put(IdentityHashMap.class, MAP);
-        map.put(Hashtable.class, MAP);
-        map.put(Properties.class, MAP);
-        map.put(TreeMap.class, MAP);
-        map.put(EnumMap.class, MAP);
-        map.put(ConcurrentHashMap.class, MAP);
-        map.put(ConcurrentSkipListMap.class, MAP);
-        map.put(WeakHashMap.class, MAP);
-        map.put(AbstractMap.class, MAP);
-
-        // Collections
-        map.put(List.class, COLLECTION);
-        map.put(ArrayList.class, COLLECTION);
-        map.put(CopyOnWriteArrayList.class, COLLECTION);
-        map.put(LinkedList.class, COLLECTION);
-        map.put(AbstractList.class, COLLECTION);
-        map.put(Set.class, COLLECTION);
-        map.put(HashSet.class, COLLECTION);
-        map.put(EnumSet.class, COLLECTION);
-        map.put(TreeSet.class, COLLECTION);
-        map.put(LinkedHashSet.class, COLLECTION);
-        map.put(CopyOnWriteArraySet.class, COLLECTION);
-        map.put(AbstractSet.class, COLLECTION);
-        map.put(ConcurrentSkipListSet.class, COLLECTION);
-
-        // Date
-        map.put(Date.class, DATE);
-        map.put(Timestamp.class, DATE);
-        map.put(java.sql.Date.class, DATE);
+        for(MapperTypeAdapter adapter : new MapperTypeAdapter[] {
+                ABSTRACT,
+                PRIMITIVE,
+                COLLECTION,
+                MAP,
+                DATE
+        }) {
+            for(Class<?> type : adapter.getSupportedTypes())
+                map.put(type, adapter);
+        }
 
         return map;
     }
@@ -88,6 +47,8 @@ public final class DefaultMappers {
         public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
             if(value instanceof String)
                 return new AbstractPrimitive((String) value);
+            if(value instanceof Boolean)
+                return new AbstractPrimitive((Boolean) value);
             return new AbstractPrimitive((Number) value);
         }
 
@@ -96,6 +57,14 @@ public final class DefaultMappers {
                 if(!element.isString())
                     throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
                 return element.string();
+            }
+            if(type.equals(char.class) || type.equals(Character.class)) {
+                if(!element.isString())
+                    throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
+                String s = element.string();
+                if(s.length() != 1)
+                    throw new MapperException("Expected string of length 1 for field " + context.getField().getName() + " but received " + s.length());
+                return s.charAt(0);
             }
             if(type.equals(Boolean.class) || type.equals(boolean.class)) {
                 if(!element.isBoolean())
@@ -117,9 +86,32 @@ public final class DefaultMappers {
                     return element.number().floatValue();
                 if(type.equals(byte.class) || type.equals(Byte.class))
                     return element.number().byteValue();
+                if(type.equals(Number.class))
+                    return element.number();
                 return element.number();
             }
             throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
+        }
+
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    String.class,
+                    char.class,
+                    Character.class,
+                    Integer.class,
+                    int.class,
+                    Long.class,
+                    long.class,
+                    Short.class,
+                    short.class,
+                    Float.class,
+                    float.class,
+                    Double.class,
+                    double.class,
+                    Boolean.class,
+                    boolean.class,
+                    Number.class
+            };
         }
 
     }
@@ -161,6 +153,26 @@ public final class DefaultMappers {
             }
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    List.class,
+                    ArrayList.class,
+                    CopyOnWriteArrayList.class,
+                    LinkedList.class,
+                    AbstractList.class,
+                    Set.class,
+                    HashSet.class,
+                    EnumSet.class,
+                    TreeSet.class,
+                    LinkedHashSet.class,
+                    CopyOnWriteArraySet.class,
+                    AbstractSet.class,
+                    ConcurrentSkipListSet.class,
+                    Vector.class,
+                    Stack.class
+            };
+        }
+
     }
 
     public static final class MapMapper implements MapperTypeAdapter {
@@ -199,6 +211,23 @@ public final class DefaultMappers {
             }
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    Map.class,
+                    HashMap.class,
+                    LinkedHashMap.class,
+                    IdentityHashMap.class,
+                    Hashtable.class,
+                    Properties.class,
+                    TreeMap.class,
+                    EnumMap.class,
+                    ConcurrentHashMap.class,
+                    ConcurrentSkipListMap.class,
+                    WeakHashMap.class,
+                    AbstractMap.class
+            };
+        }
+
     }
 
     public static final class DateMapper implements MapperTypeAdapter {
@@ -227,6 +256,14 @@ public final class DefaultMappers {
             }
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    Date.class,
+                    Timestamp.class,
+                    java.sql.Date.class
+            };
+        }
+
     }
 
     public static final class AbstractMapper implements MapperTypeAdapter {
@@ -251,6 +288,16 @@ public final class DefaultMappers {
             return element;
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    AbstractElement.class,
+                    AbstractNull.class,
+                    AbstractPrimitive.class,
+                    AbstractArray.class,
+                    AbstractObject.class
+            };
+        }
+
     }
 
     public static class FallbackMapper implements MapperTypeAdapter {
@@ -258,6 +305,8 @@ public final class DefaultMappers {
         public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
             if(value.getClass().isEnum())
                 return new AbstractPrimitive(((Enum<?>) value).name());
+            if(value.getClass().equals(UUID.class))
+                return new AbstractPrimitive(value.toString());
             MapperTypeSpec spec = MapperTypeSpec.get(value.getClass());
             if(spec == null)
                 throw new MapperException("Unmappable type '" + value.getClass().getName() + "'");
@@ -267,7 +316,10 @@ public final class DefaultMappers {
                     if(context.getMapper().isExposeRequired() ? !fs.isExpose() : fs.isHidden())
                         continue;
                     String k = fs.getName() != null ? fs.getName() : context.getMapper().getNamingPolicy().toAbstract(fs.getField().getName());
-                    object.set(k, context.getMapper().map(new MapperContext(context.getMapper(), fs.getField(), fs.getAnnotations()).adapter(fs.getAdapter()), fs.getField().get(value)));
+                    AbstractElement e = context.getMapper().map(new MapperContext(context.getMapper(), fs.getField(), fs.getAnnotations()).adapter(fs.getAdapter()), fs.getField().get(value));
+                    if(e.isNull() && context.getMapper().shouldOmitNull() && fs.shouldOmitNull())
+                        continue;
+                    object.set(k, e);
                 }
                 if(spec.getAdditionalField() != null) {
                     AbstractObject additional = (AbstractObject) spec.getAdditionalField().get(value);
@@ -290,6 +342,8 @@ public final class DefaultMappers {
                     throw new MapperException("There is no enum constant '" + element.string() + "'");
                 }
             }
+            if(type.equals(UUID.class))
+                return UUID.fromString(element.string());
             if(!element.isObject())
                 throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
             MapperTypeSpec spec = MapperTypeSpec.get(type);
@@ -297,7 +351,9 @@ public final class DefaultMappers {
                 throw new MapperException("Unmappable type '" + type.getName() + "'");
             AbstractObject o = element.object();
             try {
-                Object obj = type.newInstance();
+                Constructor constructor = type.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                Object obj = constructor.newInstance();
                 AbstractObject additional = spec.getAdditionalField() == null ? null : new AbstractObject();
                 List<String> fieldNames = spec.getFieldSpecs().stream().map(s -> s.getField().getName()).collect(Collectors.toList());
                 for(String k : o.keys()) {
@@ -324,7 +380,7 @@ public final class DefaultMappers {
                 if(additional != null)
                     spec.getAdditionalField().set(obj, additional);
                 return obj;
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new MapperException(e.getMessage());
             }
         }

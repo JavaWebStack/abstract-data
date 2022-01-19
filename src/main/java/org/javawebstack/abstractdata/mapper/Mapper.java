@@ -13,13 +13,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Mapper {
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private boolean exposeRequired;
+    private boolean omitNull = true;
     private final Map<Class<?>, MapperTypeAdapter> adapters = DefaultMappers.create();
     private final MapperContext emptyContext = new MapperContext(this, null, new HashMap<>());
 
@@ -74,6 +74,15 @@ public class Mapper {
         return dateFormat;
     }
 
+    public boolean shouldOmitNull() {
+        return omitNull;
+    }
+
+    public Mapper omitNull(boolean omitNull) {
+        this.omitNull = omitNull;
+        return this;
+    }
+
     public Mapper namingPolicy(NamingPolicy namingPolicy) {
         this.namingPolicy = namingPolicy;
         return this;
@@ -98,6 +107,15 @@ public class Mapper {
 
     public Mapper adapter(Class<?> type, MapperTypeAdapter adapter) {
         adapters.put(type, adapter);
+        return this;
+    }
+
+    public Mapper adapter(MapperTypeAdapter adapter) {
+        Class<?>[] types = adapter.getSupportedTypes();
+        if(types != null) {
+            for(Class<?> type : types)
+                adapter(type, adapter);
+        }
         return this;
     }
 

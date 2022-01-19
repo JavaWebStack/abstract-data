@@ -16,6 +16,7 @@ public @interface MapperOptions {
     Class<?>[] generic() default {};
     boolean expose() default false;
     boolean hidden() default false;
+    boolean omitNull() default true;
     Class<? extends MapperTypeAdapter> adapter() default MapperTypeAdapter.class;
 
 }

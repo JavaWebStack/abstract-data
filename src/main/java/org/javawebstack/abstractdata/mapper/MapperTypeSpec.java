@@ -7,6 +7,7 @@ import org.javawebstack.abstractdata.mapper.exception.MapperException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class MapperTypeSpec {
@@ -86,7 +87,9 @@ public class MapperTypeSpec {
             spec.order = options.order();
             spec.expose = options.expose();
             spec.hidden = options.hidden();
+            spec.omitNull = options.omitNull();
         }
+        spec.hidden = spec.hidden || Modifier.isTransient(field.getModifiers());
     }
 
     public Class<?> getType() {
@@ -98,6 +101,8 @@ public class MapperTypeSpec {
     }
 
     public Field getAdditionalField() {
+        if(additionalField != null)
+            additionalField.setAccessible(true);
         return additionalField;
     }
 
@@ -108,10 +113,12 @@ public class MapperTypeSpec {
         private int order;
         private boolean expose;
         private boolean hidden;
+        private boolean omitNull = true;
         private MapperTypeAdapter adapter;
         private Map<Class<? extends Annotation>, List<Annotation>> annotations = new HashMap<>();
 
         public Field getField() {
+            field.setAccessible(true);
             return field;
         }
 
@@ -129,6 +136,10 @@ public class MapperTypeSpec {
 
         public boolean isHidden() {
             return hidden;
+        }
+
+        public boolean shouldOmitNull() {
+            return omitNull;
         }
 
         public MapperTypeAdapter getAdapter() {
