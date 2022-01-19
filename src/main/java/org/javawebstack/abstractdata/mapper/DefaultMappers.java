@@ -59,7 +59,7 @@ public final class DefaultMappers {
                 return element.string();
             }
             if(type.equals(char.class) || type.equals(Character.class)) {
-                if(!element.isBoolean())
+                if(!element.isString())
                     throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
                 String s = element.string();
                 if(s.length() != 1)
@@ -167,7 +167,9 @@ public final class DefaultMappers {
                     LinkedHashSet.class,
                     CopyOnWriteArraySet.class,
                     AbstractSet.class,
-                    ConcurrentSkipListSet.class
+                    ConcurrentSkipListSet.class,
+                    Vector.class,
+                    Stack.class
             };
         }
 
