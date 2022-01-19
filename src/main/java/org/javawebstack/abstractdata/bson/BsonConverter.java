@@ -13,10 +13,6 @@ import java.util.Date;
 
 public class BsonConverter {
 
-    static {
-        System.out.println("Hello");
-    }
-
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public BsonConverter dateFormat(DateFormat dateFormat) {
