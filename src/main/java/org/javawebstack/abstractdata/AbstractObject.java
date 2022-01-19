@@ -1,11 +1,16 @@
 package org.javawebstack.abstractdata;
 
+import org.javawebstack.abstractdata.collector.AbstractObjectCollector;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 public class AbstractObject implements AbstractElement {
 
@@ -207,10 +212,18 @@ public class AbstractObject implements AbstractElement {
         return AbstractArray.fromList(entries.values());
     }
 
+    public Stream<Map.Entry<String, AbstractElement>> stream() {
+        return entries().stream();
+    }
+
     public AbstractElement clone() {
         AbstractObject object = new AbstractObject();
         forEach((k, v) -> object.set(k, v.clone()));
         return object;
+    }
+
+    public static <T> Collector<T, ?, AbstractObject> collect(Function<T, String> keyFunction, Function<T, AbstractElement> valueFunction) {
+        return new AbstractObjectCollector<>(keyFunction, valueFunction);
     }
 
 }

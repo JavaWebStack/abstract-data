@@ -1,6 +1,10 @@
 package org.javawebstack.abstractdata;
 
+import org.javawebstack.abstractdata.collector.AbstractArrayCollector;
+
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public class AbstractArray implements AbstractElement, Iterable<AbstractElement> {
@@ -287,6 +291,14 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         AbstractArray array = new AbstractArray();
         forEach(e -> array.add(e.clone()));
         return array;
+    }
+
+    public static <T> Collector<T, ?, AbstractArray> collect(Function<T, AbstractElement> mappingFunction) {
+        return new AbstractArrayCollector<>(mappingFunction);
+    }
+
+    public static <T extends AbstractElement> Collector<T, ?, AbstractArray> collect() {
+        return new AbstractArrayCollector<>(e -> e);
     }
 
 }
