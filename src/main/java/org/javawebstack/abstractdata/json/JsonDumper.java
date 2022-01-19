@@ -39,6 +39,10 @@ public class JsonDumper {
             return Collections.singletonList("\"" + escape(element.string()) + "\"");
         if(element.isObject()) {
             List<String> lines =new ArrayList<>();
+            if(element.object().size() == 0) {
+                lines.add("{}");
+                return lines;
+            }
             if(pretty) {
                 lines.add("{");
                 List<String> keys = new ArrayList<>(element.object().keys());
@@ -59,6 +63,10 @@ public class JsonDumper {
         }
         if(element.isArray()) {
             List<String> lines =new ArrayList<>();
+            if(element.array().size() == 0) {
+                lines.add("[]");
+                return lines;
+            }
             if(pretty) {
                 lines.add("[");
                 AbstractArray array = element.array();

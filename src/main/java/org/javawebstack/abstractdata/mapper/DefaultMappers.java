@@ -276,7 +276,10 @@ public final class DefaultMappers {
                     if(context.getMapper().isExposeRequired() ? !fs.isExpose() : fs.isHidden())
                         continue;
                     String k = fs.getName() != null ? fs.getName() : context.getMapper().getNamingPolicy().toAbstract(fs.getField().getName());
-                    object.set(k, context.getMapper().map(new MapperContext(context.getMapper(), fs.getField(), fs.getAnnotations()).adapter(fs.getAdapter()), fs.getField().get(value)));
+                    AbstractElement e = context.getMapper().map(new MapperContext(context.getMapper(), fs.getField(), fs.getAnnotations()).adapter(fs.getAdapter()), fs.getField().get(value));
+                    if(e.isNull() && context.getMapper().shouldOmitNull() && fs.shouldOmitNull())
+                        continue;
+                    object.set(k, e);
                 }
                 if(spec.getAdditionalField() != null) {
                     AbstractObject additional = (AbstractObject) spec.getAdditionalField().get(value);
