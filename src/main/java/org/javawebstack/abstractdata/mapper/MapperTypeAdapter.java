@@ -7,5 +7,8 @@ public interface MapperTypeAdapter {
 
     AbstractElement toAbstract(MapperContext context, Object value) throws MapperException;
     Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException;
+    default Class<?>[] getSupportedTypes() {
+        return null;
+    }
 
 }

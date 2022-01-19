@@ -111,6 +111,15 @@ public class Mapper {
         return this;
     }
 
+    public Mapper adapter(MapperTypeAdapter adapter) {
+        Class<?>[] types = adapter.getSupportedTypes();
+        if(types != null) {
+            for(Class<?> type : types)
+                adapter(type, adapter);
+        }
+        return this;
+    }
+
     public Map<Class<?>, MapperTypeAdapter> getAdapters() {
         return adapters;
     }
