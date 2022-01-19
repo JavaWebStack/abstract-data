@@ -58,6 +58,14 @@ public final class DefaultMappers {
                     throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
                 return element.string();
             }
+            if(type.equals(char.class) || type.equals(Character.class)) {
+                if(!element.isBoolean())
+                    throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
+                String s = element.string();
+                if(s.length() != 1)
+                    throw new MapperException("Expected string of length 1 for field " + context.getField().getName() + " but received " + s.length());
+                return s.charAt(0);
+            }
             if(type.equals(Boolean.class) || type.equals(boolean.class)) {
                 if(!element.isBoolean())
                     throw new MapperWrongTypeException(context.getField().getName(), "boolean", Helpers.typeName(element));
@@ -88,6 +96,8 @@ public final class DefaultMappers {
         public Class<?>[] getSupportedTypes() {
             return new Class[] {
                     String.class,
+                    char.class,
+                    Character.class,
                     Integer.class,
                     int.class,
                     Long.class,
