@@ -3,7 +3,10 @@ package org.javawebstack.abstractdata.collector;
 import org.javawebstack.abstractdata.AbstractArray;
 import org.javawebstack.abstractdata.AbstractElement;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;

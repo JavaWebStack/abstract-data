@@ -3,7 +3,6 @@ package org.javawebstack.abstractdata;
 import org.bson.BsonValue;
 import org.javawebstack.abstractdata.bson.BsonConverter;
 import org.javawebstack.abstractdata.bson.BsonTypeAdapter;
-import org.javawebstack.abstractdata.collector.AbstractObjectCollector;
 import org.javawebstack.abstractdata.json.JsonDumper;
 import org.javawebstack.abstractdata.json.JsonParser;
 import org.javawebstack.abstractdata.util.QueryString;
@@ -11,13 +10,9 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public interface AbstractElement {
 
