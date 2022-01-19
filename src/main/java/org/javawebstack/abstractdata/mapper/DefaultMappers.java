@@ -26,60 +26,16 @@ public final class DefaultMappers {
     public static Map<Class<?>, MapperTypeAdapter> create() {
         Map<Class<?>, MapperTypeAdapter> map = new HashMap<>();
 
-        // Abstract
-        map.put(AbstractElement.class, ABSTRACT);
-        map.put(AbstractNull.class, ABSTRACT);
-        map.put(AbstractPrimitive.class, ABSTRACT);
-        map.put(AbstractObject.class, ABSTRACT);
-        map.put(AbstractArray.class, ABSTRACT);
-
-        // Primitives
-        map.put(String.class, PRIMITIVE);
-        map.put(Integer.class, PRIMITIVE);
-        map.put(int.class, PRIMITIVE);
-        map.put(Long.class, PRIMITIVE);
-        map.put(long.class, PRIMITIVE);
-        map.put(Short.class, PRIMITIVE);
-        map.put(short.class, PRIMITIVE);
-        map.put(Float.class, PRIMITIVE);
-        map.put(float.class, PRIMITIVE);
-        map.put(Double.class, PRIMITIVE);
-        map.put(double.class, PRIMITIVE);
-        map.put(Boolean.class, PRIMITIVE);
-        map.put(boolean.class, PRIMITIVE);
-        map.put(Number.class, PRIMITIVE);
-        map.put(Map.class, MAP);
-        map.put(HashMap.class, MAP);
-        map.put(LinkedHashMap.class, MAP);
-        map.put(IdentityHashMap.class, MAP);
-        map.put(Hashtable.class, MAP);
-        map.put(Properties.class, MAP);
-        map.put(TreeMap.class, MAP);
-        map.put(EnumMap.class, MAP);
-        map.put(ConcurrentHashMap.class, MAP);
-        map.put(ConcurrentSkipListMap.class, MAP);
-        map.put(WeakHashMap.class, MAP);
-        map.put(AbstractMap.class, MAP);
-
-        // Collections
-        map.put(List.class, COLLECTION);
-        map.put(ArrayList.class, COLLECTION);
-        map.put(CopyOnWriteArrayList.class, COLLECTION);
-        map.put(LinkedList.class, COLLECTION);
-        map.put(AbstractList.class, COLLECTION);
-        map.put(Set.class, COLLECTION);
-        map.put(HashSet.class, COLLECTION);
-        map.put(EnumSet.class, COLLECTION);
-        map.put(TreeSet.class, COLLECTION);
-        map.put(LinkedHashSet.class, COLLECTION);
-        map.put(CopyOnWriteArraySet.class, COLLECTION);
-        map.put(AbstractSet.class, COLLECTION);
-        map.put(ConcurrentSkipListSet.class, COLLECTION);
-
-        // Date
-        map.put(Date.class, DATE);
-        map.put(Timestamp.class, DATE);
-        map.put(java.sql.Date.class, DATE);
+        for(MapperTypeAdapter adapter : new MapperTypeAdapter[] {
+                ABSTRACT,
+                PRIMITIVE,
+                COLLECTION,
+                MAP,
+                DATE
+        }) {
+            for(Class<?> type : adapter.getSupportedTypes())
+                map.put(type, adapter);
+        }
 
         return map;
     }
@@ -129,6 +85,25 @@ public final class DefaultMappers {
             throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    String.class,
+                    Integer.class,
+                    int.class,
+                    Long.class,
+                    long.class,
+                    Short.class,
+                    short.class,
+                    Float.class,
+                    float.class,
+                    Double.class,
+                    double.class,
+                    Boolean.class,
+                    boolean.class,
+                    Number.class
+            };
+        }
+
     }
 
     public static final class CollectionMapper implements MapperTypeAdapter {
@@ -166,6 +141,24 @@ public final class DefaultMappers {
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    List.class,
+                    ArrayList.class,
+                    CopyOnWriteArrayList.class,
+                    LinkedList.class,
+                    AbstractList.class,
+                    Set.class,
+                    HashSet.class,
+                    EnumSet.class,
+                    TreeSet.class,
+                    LinkedHashSet.class,
+                    CopyOnWriteArraySet.class,
+                    AbstractSet.class,
+                    ConcurrentSkipListSet.class
+            };
         }
 
     }
@@ -206,6 +199,23 @@ public final class DefaultMappers {
             }
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    Map.class,
+                    HashMap.class,
+                    LinkedHashMap.class,
+                    IdentityHashMap.class,
+                    Hashtable.class,
+                    Properties.class,
+                    TreeMap.class,
+                    EnumMap.class,
+                    ConcurrentHashMap.class,
+                    ConcurrentSkipListMap.class,
+                    WeakHashMap.class,
+                    AbstractMap.class
+            };
+        }
+
     }
 
     public static final class DateMapper implements MapperTypeAdapter {
@@ -234,6 +244,14 @@ public final class DefaultMappers {
             }
         }
 
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    Date.class,
+                    Timestamp.class,
+                    java.sql.Date.class
+            };
+        }
+
     }
 
     public static final class AbstractMapper implements MapperTypeAdapter {
@@ -256,6 +274,16 @@ public final class DefaultMappers {
             if(type.equals(AbstractArray.class) && !(element instanceof AbstractArray))
                 throw new MapperWrongTypeException(context.getField().getName(), "array", Helpers.typeName(element));
             return element;
+        }
+
+        public Class<?>[] getSupportedTypes() {
+            return new Class[] {
+                    AbstractElement.class,
+                    AbstractNull.class,
+                    AbstractPrimitive.class,
+                    AbstractArray.class,
+                    AbstractObject.class
+            };
         }
 
     }
