@@ -71,6 +71,7 @@ public class MapperTypeSpec {
         fieldSpecs.add(spec);
 
         spec.field = field;
+        spec.name = field.getName();
         spec.annotations = annotations;
 
         if(annotations.containsKey(MapperOptions.class)) {
