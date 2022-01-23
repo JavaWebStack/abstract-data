@@ -11,7 +11,7 @@ public class SnakeCaseNamingPolicy implements NamingPolicy {
     }
 
     public String fromAbstract(String source, List<String> fieldNames) {
-        return fieldNames.stream().map(this::toAbstract).filter(s -> s.equals(source)).findFirst().orElse(source);
+        return fieldNames.stream().filter(s -> toAbstract(s).equals(source)).findFirst().orElse(source);
     }
 
 }
