@@ -114,7 +114,7 @@ public class JsonParser {
 
     private AbstractPrimitive parseNumber(Deque<Character> stack) {
         StringBuilder sb = new StringBuilder();
-        while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-')
+        while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e')
             sb.append(stack.pop());
         String s = sb.toString();
         if(s.contains(".")) {
