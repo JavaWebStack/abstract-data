@@ -98,6 +98,30 @@ public class AbstractObject implements AbstractElement {
         return entries.containsKey(key);
     }
 
+    public boolean hasString(String key) {
+        return has(key) && get(key).isString();
+    }
+
+    public boolean hasNumber(String key) {
+        return has(key) && get(key).isNumber();
+    }
+
+    public boolean hasBoolean(String key) {
+        return has(key) && get(key).isBoolean();
+    }
+
+    public boolean hasPrimitive(String key) {
+        return has(key) && get(key).isPrimitive();
+    }
+
+    public boolean hasObject(String key) {
+        return has(key) && get(key).isObject();
+    }
+
+    public boolean hasArray(String key) {
+        return has(key) && get(key).isArray();
+    }
+
     public int size() {
         return entries.size();
     }
@@ -113,7 +137,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractObject object(String key) {
-        return query(key).object();
+        return query(key, AbstractNull.INSTANCE).object();
     }
 
     public AbstractObject object(String key, AbstractObject orElse) {
@@ -121,7 +145,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractArray array(String key) {
-        return query(key).array();
+        return query(key, AbstractNull.INSTANCE).array();
     }
 
     public AbstractArray array(String key, AbstractArray orElse) {
@@ -129,7 +153,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractPrimitive primitive(String key) {
-        return query(key).primitive();
+        return query(key, AbstractNull.INSTANCE).primitive();
     }
 
     public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
@@ -137,7 +161,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public String string(String key) {
-        return query(key).string();
+        return query(key, AbstractNull.INSTANCE).string();
     }
 
     public String string(String key, String orElse) {
@@ -145,7 +169,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public Boolean bool(String key) {
-        return query(key).bool();
+        return query(key, AbstractNull.INSTANCE).bool();
     }
 
     public Boolean bool(String key, Boolean orElse) {
@@ -153,7 +177,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public Number number(String key) {
-        return query(key).number();
+        return query(key, AbstractNull.INSTANCE).number();
     }
 
     public Number number(String key, Number orElse) {
