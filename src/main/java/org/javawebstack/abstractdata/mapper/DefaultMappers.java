@@ -251,8 +251,8 @@ public final class DefaultMappers {
                 if(type.equals(Timestamp.class))
                     return new Timestamp(context.getMapper().getDateFormat().parse(element.string()).getTime());
                 throw new MapperException("Unsupported date type '" + type.getName() + "'");
-            } catch (ParseException ex) {
-                throw new MapperException("Failed to parse date ''" + (context.getField() != null ? (" for field '" + context.getField().getName() + "'") : ""));
+            } catch (ParseException | NumberFormatException ex) {
+                throw new MapperException("Failed to parse date '" + element.string() + "'" + (context.getField() != null ? (" for field '" + context.getField().getName() + "'") : ""));
             }
         }
 
