@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class Mapper {
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private boolean exposeRequired;
     private boolean omitNull = true;
@@ -62,16 +62,12 @@ public class Mapper {
     }
 
     public Mapper dateFormat(String format) {
-        return dateFormat(new SimpleDateFormat(format));
-    }
-
-    public Mapper dateFormat(DateFormat dateFormat) {
-        this.dateFormat = dateFormat;
+        this.dateFormat = format;
         return this;
     }
 
     public DateFormat getDateFormat() {
-        return dateFormat;
+        return new SimpleDateFormat(dateFormat);
     }
 
     public boolean shouldOmitNull() {
