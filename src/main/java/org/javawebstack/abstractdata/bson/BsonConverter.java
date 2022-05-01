@@ -1,14 +1,15 @@
 package org.javawebstack.abstractdata.bson;
 
 import org.bson.*;
-import org.bson.internal.Base64;
 import org.bson.types.Decimal128;
 import org.bson.types.ObjectId;
 import org.javawebstack.abstractdata.*;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 
 public class BsonConverter {
@@ -77,8 +78,9 @@ public class BsonConverter {
                         .set("i", Integer.toUnsignedLong(value.asTimestamp().getInc()))
                 );
             case BINARY:
+                String base64 = new String(Base64.getEncoder().encode(value.asBinary().getData()));
                 return new AbstractObject().set("$binary", new AbstractObject()
-                        .set("base64", Base64.encode(value.asBinary().getData()))
+                        .set("base64", base64)
                         .set("subType", String.format("%02x", value.asBinary().getType()))
                 );
             case ARRAY: {
@@ -155,7 +157,7 @@ public class BsonConverter {
         if(o.size() == 1 && o.has("$binary") && o.get("$binary").isObject()) {
             AbstractObject bin = o.object("$binary");
             if(bin.has("base64") && bin.has("subType") && bin.get("base64").isString() && bin.get("subType").isString()) {
-                byte[] data = Base64.decode(bin.string("base64"));
+                byte[] data = Base64.getDecoder().decode(bin.string("base64"));
                 byte type = (byte) Integer.parseInt(bin.string("subType"), 16);
                 return new BsonBinary(type, data);
             }
