@@ -47,10 +47,13 @@ public class MapperTypeSpec {
         do {
             classes.push(current);
             current = current.getSuperclass();
-        } while (!Object.class.equals(current));
+        } while (!Object.class.equals(current)); // Collect parent classes recursively
         while (!classes.empty()) {
-            for(Field f : classes.pop().getDeclaredFields())
+            for(Field f : classes.pop().getDeclaredFields()) {
+                if(Modifier.isStatic(f.getModifiers())) // Don't include static fields
+                    continue;
                 checkoutField(f);
+            }
         }
         fieldSpecs.sort(Comparator.comparingInt(a -> a.order));
     }

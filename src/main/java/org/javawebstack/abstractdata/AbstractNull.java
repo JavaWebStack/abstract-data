@@ -1,17 +1,39 @@
 package org.javawebstack.abstractdata;
 
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class AbstractNull implements AbstractElement {
 
-    public static final AbstractNull INSTANCE = new AbstractNull();
+    public static final AbstractNull VALUE = new AbstractNull();
+    @Deprecated
+    public static final AbstractNull INSTANCE = VALUE;
 
     private AbstractNull() {
     }
 
     public boolean isNull() {
         return true;
+    }
+
+    public String string(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.STRING, Type.NULL);
+        return null;
+    }
+
+    public Boolean bool(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.STRING, Type.NULL);
+        return null;
+    }
+
+    public Number number(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.STRING, Type.NULL);
+        return null;
     }
 
     public Object toObject() {

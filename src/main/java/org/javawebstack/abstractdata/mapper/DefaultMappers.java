@@ -1,6 +1,8 @@
 package org.javawebstack.abstractdata.mapper;
 
 import org.javawebstack.abstractdata.*;
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
+import org.javawebstack.abstractdata.mapper.annotation.DateFormat;
 import org.javawebstack.abstractdata.mapper.exception.MapperException;
 import org.javawebstack.abstractdata.mapper.exception.MapperWrongTypeException;
 import org.javawebstack.abstractdata.util.Helpers;
@@ -9,6 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -54,41 +57,55 @@ public final class DefaultMappers {
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
             if(type.equals(String.class)) {
-                if(!element.isString())
+                try {
+                    return element.string(context.getMapper().isStrict());
+                } catch (AbstractCoercingException ex) {
                     throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
-                return element.string();
+                }
             }
             if(type.equals(char.class) || type.equals(Character.class)) {
-                if(!element.isString())
+                if(type.isPrimitive() && element.isNull())
+                    throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                try {
+                    String s = element.string(context.getMapper().isStrict());
+                    if(s.length() != 1)
+                        throw new MapperException("Expected string of length 1 for field " + context.getField().getName() + " but received " + s.length());
+                    return s.charAt(0);
+                } catch (AbstractCoercingException ex) {
                     throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
-                String s = element.string();
-                if(s.length() != 1)
-                    throw new MapperException("Expected string of length 1 for field " + context.getField().getName() + " but received " + s.length());
-                return s.charAt(0);
+                }
             }
             if(type.equals(Boolean.class) || type.equals(boolean.class)) {
-                if(!element.isBoolean())
+                if(type.isPrimitive() && element.isNull())
+                    throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                try {
+                    return element.bool(context.getMapper().isStrict());
+                } catch (AbstractCoercingException ex) {
                     throw new MapperWrongTypeException(context.getField().getName(), "boolean", Helpers.typeName(element));
-                return element.bool();
+                }
             }
             if(Number.class.isAssignableFrom(type) || type.isPrimitive()) {
-                if(!element.isNumber())
+                if(type.isPrimitive() && element.isNull())
+                    throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                try {
+                    if(type.equals(int.class) || type.equals(Integer.class))
+                        return element.number(context.getMapper().isStrict()).intValue();
+                    if(type.equals(long.class) || type.equals(Long.class))
+                        return element.number(context.getMapper().isStrict()).longValue();
+                    if(type.equals(short.class) || type.equals(Short.class))
+                        return element.number(context.getMapper().isStrict()).shortValue();
+                    if(type.equals(double.class) || type.equals(Double.class))
+                        return element.number(context.getMapper().isStrict()).doubleValue();
+                    if(type.equals(float.class) || type.equals(Float.class))
+                        return element.number(context.getMapper().isStrict()).floatValue();
+                    if(type.equals(byte.class) || type.equals(Byte.class))
+                        return element.number(context.getMapper().isStrict()).byteValue();
+                    if(type.equals(Number.class))
+                        return element.number(context.getMapper().isStrict());
+                    return element.number(context.getMapper().isStrict());
+                } catch (AbstractCoercingException ex) {
                     throw new MapperWrongTypeException(context.getField().getName(), "number", Helpers.typeName(element));
-                if(type.equals(int.class) || type.equals(Integer.class))
-                    return element.number().intValue();
-                if(type.equals(long.class) || type.equals(Long.class))
-                    return element.number().longValue();
-                if(type.equals(short.class) || type.equals(Short.class))
-                    return element.number().shortValue();
-                if(type.equals(double.class) || type.equals(Double.class))
-                    return element.number().doubleValue();
-                if(type.equals(float.class) || type.equals(Float.class))
-                    return element.number().floatValue();
-                if(type.equals(byte.class) || type.equals(Byte.class))
-                    return element.number().byteValue();
-                if(type.equals(Number.class))
-                    return element.number();
-                return element.number();
+                }
             }
             throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
         }
@@ -128,26 +145,28 @@ public final class DefaultMappers {
         }
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
-            if(!element.isArray())
-                throw new MapperWrongTypeException(context.getField().getName(), "array", Helpers.typeName(element));
             if(type.equals(List.class) || type.equals(AbstractList.class))
                 type = ArrayList.class;
             if(type.equals(Set.class))
                 type = HashSet.class;
             try {
-                Collection<Object> collection = (Collection<Object>) type.newInstance();
-                Class<?>[] genericTypes = context.getGenericTypes();
-                Class<?> elementType = genericTypes.length > 0 ? genericTypes[0] : null;
-                if(elementType == null) {
-                    for(AbstractElement e : element.array()) {
-                        elementType = Helpers.guessGeneric(e);
-                        if(elementType != null)
-                            break;
+                try {
+                    Collection<Object> collection = (Collection<Object>) type.newInstance();
+                    Class<?>[] genericTypes = context.getGenericTypes();
+                    Class<?> elementType = genericTypes.length > 0 ? genericTypes[0] : null;
+                    if(elementType == null) {
+                        for(AbstractElement e : element.array(context.getMapper().isStrict())) {
+                            elementType = Helpers.guessGeneric(e);
+                            if(elementType != null)
+                                break;
+                        }
                     }
+                    for(AbstractElement e : element.array(context.getMapper().isStrict()))
+                        collection.add(context.getMapper().map(e, elementType));
+                    return collection;
+                } catch (AbstractCoercingException ex) {
+                    throw new MapperWrongTypeException(context.getField().getName(), "array", Helpers.typeName(element));
                 }
-                for(AbstractElement e : element.array())
-                    collection.add(context.getMapper().map(e, elementType));
-                return collection;
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -187,25 +206,27 @@ public final class DefaultMappers {
         }
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
-            if(!element.isObject())
-                throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
             if(type.equals(Map.class) || type.equals(AbstractMap.class))
                 type = HashMap.class;
             try {
-                Map<Object, Object> map = (Map<Object, Object>) type.newInstance();
-                Class<?>[] genericTypes = context.getGenericTypes();
-                Class<?> keyType = genericTypes.length > 0 ? genericTypes[0] : String.class;
-                Class<?> valueType = genericTypes.length > 1 ? genericTypes[1] : null;
-                if(valueType == null) {
-                    for(AbstractElement e : element.object().values()) {
-                        valueType = Helpers.guessGeneric(e);
-                        if(valueType != null)
-                            break;
+                try {
+                    Map<Object, Object> map = (Map<Object, Object>) type.newInstance();
+                    Class<?>[] genericTypes = context.getGenericTypes();
+                    Class<?> keyType = genericTypes.length > 0 ? genericTypes[0] : String.class;
+                    Class<?> valueType = genericTypes.length > 1 ? genericTypes[1] : null;
+                    if(valueType == null) {
+                        for(AbstractElement e : element.object().values()) {
+                            valueType = Helpers.guessGeneric(e);
+                            if(valueType != null)
+                                break;
+                        }
                     }
+                    for(String k : element.object().keys())
+                        map.put(context.getMapper().map(new AbstractPrimitive(k), keyType), context.getMapper().map(element.object().get(k), valueType));
+                    return map;
+                } catch (AbstractCoercingException ex) {
+                    throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
                 }
-                for(String k : element.object().keys())
-                    map.put(context.getMapper().map(new AbstractPrimitive(k), keyType), context.getMapper().map(element.object().get(k), valueType));
-                return map;
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -235,24 +256,42 @@ public final class DefaultMappers {
         private DateMapper() {}
 
         public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
-            if(value instanceof Date)
-                return new AbstractPrimitive(context.getMapper().getDateFormat().format((Date) value));
+            DateFormat df = context.getAnnotation(DateFormat.class);
+            if(value instanceof Date) {
+                if(df != null && df.epoch()) {
+                    long time = ((Date) value).getTime();
+                    if(!df.millis())
+                        time /= 1000;
+                    return new AbstractPrimitive(time);
+                }
+                java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
+                return new AbstractPrimitive(dateFormat.format((Date) value));
+            }
             return null;
         }
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
-            if(!element.isString())
-                throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
             try {
+                DateFormat df = context.getAnnotation(DateFormat.class);
+                java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
+                Date date;
+                try {
+                    long time = element.number(context.getMapper().isStrict()).longValue();
+                    if(df != null && !df.millis())
+                        time *= 1000;
+                    date = new Date(time);
+                } catch (AbstractCoercingException ex) {
+                    date = dateFormat.parse(element.string(context.getMapper().isStrict()));
+                }
                 if(type.equals(Date.class))
-                    return context.getMapper().getDateFormat().parse(element.string());
+                    return date;
                 if(type.equals(java.sql.Date.class))
-                    return new java.sql.Date(context.getMapper().getDateFormat().parse(element.string()).getTime());
+                    return new java.sql.Date(date.getTime());
                 if(type.equals(Timestamp.class))
-                    return new Timestamp(context.getMapper().getDateFormat().parse(element.string()).getTime());
+                    return new Timestamp(date.getTime());
                 throw new MapperException("Unsupported date type '" + type.getName() + "'");
-            } catch (ParseException ex) {
-                throw new MapperException("Failed to parse date ''" + (context.getField() != null ? (" for field '" + context.getField().getName() + "'") : ""));
+            } catch (ParseException | NumberFormatException | AbstractCoercingException ex) {
+                throw new MapperException("Failed to parse date '" + element.string() + "'" + (context.getField() != null ? (" for field '" + context.getField().getName() + "'") : ""));
             }
         }
 

@@ -16,10 +16,11 @@ import java.util.Map;
 
 public class Mapper {
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private String dateFormat = "yyyy-MM-dd HH:mm:ss";
     private NamingPolicy namingPolicy = NamingPolicy.NONE;
     private boolean exposeRequired;
     private boolean omitNull = true;
+    private boolean strict = false;
     private final Map<Class<?>, MapperTypeAdapter> adapters = DefaultMappers.create();
     private final MapperContext emptyContext = new MapperContext(this, null, new HashMap<>());
 
@@ -49,7 +50,7 @@ public class Mapper {
 
     public AbstractElement map(MapperContext context, Object obj) throws MapperException {
         if(obj == null)
-            return AbstractNull.INSTANCE;
+            return AbstractNull.VALUE;
         if(obj.getClass().isArray()) {
             AbstractArray array = new AbstractArray();
             for(int i=0; i<Array.getLength(obj); i++)
@@ -61,17 +62,26 @@ public class Mapper {
         return adapters.getOrDefault(obj.getClass(), DefaultMappers.FALLBACK).toAbstract(context, obj);
     }
 
-    public Mapper dateFormat(String format) {
-        return dateFormat(new SimpleDateFormat(format));
+    public Mapper strict() {
+        return strict(true);
     }
 
-    public Mapper dateFormat(DateFormat dateFormat) {
-        this.dateFormat = dateFormat;
+    public Mapper strict(boolean strict) {
+        this.strict = strict;
+        return this;
+    }
+
+    public boolean isStrict() {
+        return strict;
+    }
+
+    public Mapper dateFormat(String format) {
+        this.dateFormat = format;
         return this;
     }
 
     public DateFormat getDateFormat() {
-        return dateFormat;
+        return new SimpleDateFormat(dateFormat);
     }
 
     public boolean shouldOmitNull() {

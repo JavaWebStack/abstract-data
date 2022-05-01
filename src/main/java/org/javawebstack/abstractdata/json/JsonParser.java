@@ -82,7 +82,7 @@ public class JsonParser {
                 if(stack.peek() != 'l')
                     return null;
                 stack.pop();
-                return AbstractNull.INSTANCE;
+                return AbstractNull.VALUE;
             }
             case '0':
             case '1':
@@ -114,7 +114,7 @@ public class JsonParser {
 
     private AbstractPrimitive parseNumber(Deque<Character> stack) {
         StringBuilder sb = new StringBuilder();
-        while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-')
+        while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e')
             sb.append(stack.pop());
         String s = sb.toString();
         if(s.contains(".")) {

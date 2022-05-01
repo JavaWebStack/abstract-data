@@ -1,6 +1,7 @@
 package org.javawebstack.abstractdata;
 
 import org.javawebstack.abstractdata.collector.AbstractObjectCollector;
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -21,13 +22,13 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractObject setNull(String key) {
-        set(key, AbstractNull.INSTANCE);
+        set(key, AbstractNull.VALUE);
         return this;
     }
 
     public AbstractObject set(String key, AbstractElement value) {
         if (value == null)
-            value = AbstractNull.INSTANCE;
+            value = AbstractNull.VALUE;
         entries.put(key, value);
         return this;
     }
@@ -98,65 +99,91 @@ public class AbstractObject implements AbstractElement {
         return entries.containsKey(key);
     }
 
+    public boolean hasString(String key) {
+        return has(key) && get(key).isString();
+    }
+
+    public boolean hasNumber(String key) {
+        return has(key) && get(key).isNumber();
+    }
+
+    public boolean hasBoolean(String key) {
+        return has(key) && get(key).isBoolean();
+    }
+
+    public boolean hasPrimitive(String key) {
+        return has(key) && get(key).isPrimitive();
+    }
+
+    public boolean hasObject(String key) {
+        return has(key) && get(key).isObject();
+    }
+
+    public boolean hasArray(String key) {
+        return has(key) && get(key).isArray();
+    }
+
     public int size() {
         return entries.size();
     }
 
-    public AbstractArray array() {
+    public AbstractArray array(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
         AbstractArray array = new AbstractArray();
         for (int i = 0; i < size(); i++) {
             if (!has(String.valueOf(i)))
-                return null;
+                throw new AbstractCoercingException(Type.ARRAY, this);
             array.add(get(String.valueOf(i)));
         }
         return array;
     }
 
-    public AbstractObject object(String key) {
-        return query(key).object();
+    public AbstractObject object(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).object();
     }
 
-    public AbstractObject object(String key, AbstractObject orElse) {
+    public AbstractObject object(String key, AbstractObject orElse) throws AbstractCoercingException {
         return query(key, orElse).object();
     }
 
-    public AbstractArray array(String key) {
-        return query(key).array();
+    public AbstractArray array(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).array();
     }
 
-    public AbstractArray array(String key, AbstractArray orElse) {
+    public AbstractArray array(String key, AbstractArray orElse) throws AbstractCoercingException {
         return query(key, orElse).array();
     }
 
-    public AbstractPrimitive primitive(String key) {
-        return query(key).primitive();
+    public AbstractPrimitive primitive(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).primitive();
     }
 
-    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
+    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) throws AbstractCoercingException {
         return query(key, orElse).primitive();
     }
 
-    public String string(String key) {
-        return query(key).string();
+    public String string(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).string();
     }
 
-    public String string(String key, String orElse) {
+    public String string(String key, String orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).string();
     }
 
-    public Boolean bool(String key) {
-        return query(key).bool();
+    public Boolean bool(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).bool();
     }
 
-    public Boolean bool(String key, Boolean orElse) {
+    public Boolean bool(String key, Boolean orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).bool();
     }
 
-    public Number number(String key) {
-        return query(key).number();
+    public Number number(String key) throws AbstractCoercingException {
+        return query(key, AbstractNull.VALUE).number();
     }
 
-    public Number number(String key, Number orElse) {
+    public Number number(String key, Number orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).number();
     }
 
