@@ -1,5 +1,9 @@
 package org.javawebstack.abstractdata;
 
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
+
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,14 +11,20 @@ public class AbstractPrimitive implements AbstractElement {
     private final Object value;
 
     public AbstractPrimitive(Number value) {
+        if(value == null)
+            throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
 
     public AbstractPrimitive(Boolean value) {
+        if(value == null)
+            throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
 
     public AbstractPrimitive(String value) {
+        if(value == null)
+            throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
 
@@ -38,18 +48,89 @@ public class AbstractPrimitive implements AbstractElement {
         return this;
     }
 
-    public String string() {
+    public String string() throws AbstractCoercingException {
+        return string(false);
+    }
+
+    public String string(boolean strict) throws AbstractCoercingException {
+        if(!(value instanceof String)) {
+            if(strict)
+                throw new AbstractCoercingException(Type.STRING, getType());
+            switch (getType()) {
+                case BOOLEAN:
+                    return bool().toString();
+                case NUMBER:
+                    return number().toString();
+                default:
+                    throw new AbstractCoercingException(Type.STRING, getType());
+            }
+        }
         return (String) value;
     }
 
-    public Number number() {
+    public Number number() throws AbstractCoercingException {
+        return number(false);
+    }
+
+    public Number number(boolean strict) throws AbstractCoercingException {
+        if(!(value instanceof Number)) {
+            if(strict)
+                throw new AbstractCoercingException(Type.NUMBER, getType());
+            switch (getType()) {
+                case BOOLEAN:
+                    return ((Boolean) value) ? 1 : 0;
+                case STRING: {
+                    try {
+                        return NumberFormat.getNumberInstance().parse((String) value);
+                    } catch (ParseException e) {
+                        throw new AbstractCoercingException(Type.NUMBER, this);
+                    }
+                }
+                default:
+                    throw new AbstractCoercingException(Type.NUMBER, getType());
+            }
+        }
         return (Number) value;
     }
 
-    public Boolean bool() {
-        if (isBoolean())
-            return (Boolean) value;
-        return null;
+    public Boolean bool() throws AbstractCoercingException {
+        return bool(false);
+    }
+
+    public Boolean bool(boolean strict) throws AbstractCoercingException {
+        if(!(value instanceof Boolean)) {
+            if(strict)
+                throw new AbstractCoercingException(Type.BOOLEAN, getType());
+            switch (getType()) {
+                case STRING: {
+                    switch (((String) value)) {
+                        case "1":
+                        case "true":
+                        case "yes":
+                        case "y":
+                            return true;
+                        case "0":
+                        case "false":
+                        case "no":
+                        case "n":
+                            return false;
+                        default:
+                            throw new AbstractCoercingException(Type.BOOLEAN, this);
+                    }
+                }
+                case NUMBER: {
+                    long l = ((Number) value).longValue();
+                    if(l == 0)
+                        return false;
+                    if(l == 1)
+                        return true;
+                    throw new AbstractCoercingException(Type.BOOLEAN, this);
+                }
+                default:
+                    throw new AbstractCoercingException(Type.BOOLEAN, getType());
+            }
+        }
+        return (Boolean) value;
     }
 
     public Object value() {

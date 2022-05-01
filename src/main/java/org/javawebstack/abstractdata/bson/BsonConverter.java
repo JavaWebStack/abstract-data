@@ -35,7 +35,7 @@ public class BsonConverter {
     public AbstractElement toAbstract(BsonValue value) {
         switch (value.getBsonType()) {
             case NULL:
-                return AbstractNull.INSTANCE;
+                return AbstractNull.VALUE;
             case STRING:
                 return new AbstractPrimitive(value.asString().getValue());
             case BOOLEAN:

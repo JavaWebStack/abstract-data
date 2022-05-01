@@ -1,6 +1,7 @@
 package org.javawebstack.abstractdata;
 
 import org.javawebstack.abstractdata.collector.AbstractArrayCollector;
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 
 import java.util.*;
 import java.util.function.Function;
@@ -15,109 +16,118 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return true;
     }
 
-    public AbstractArray array() {
+    public AbstractArray array(boolean strict) throws AbstractCoercingException {
         return this;
     }
 
-    public AbstractObject object(String key) {
+    public AbstractObject object(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.OBJECT, Type.ARRAY);
+        AbstractObject object = new AbstractObject();
+        for(int i=0; i< elements.size(); i++)
+            object.set(String.valueOf(i), elements.get(i));
+        return object;
+    }
+
+    public AbstractObject object(String key) throws AbstractCoercingException {
         return query(key).object();
     }
 
-    public AbstractArray array(String key) {
+    public AbstractArray array(String key) throws AbstractCoercingException {
         return query(key).array();
     }
 
-    public AbstractPrimitive primitive(String key) {
+    public AbstractPrimitive primitive(String key) throws AbstractCoercingException {
         return query(key).primitive();
     }
 
-    public String string(String key) {
+    public String string(String key) throws AbstractCoercingException {
         return query(key).string();
     }
 
-    public Boolean bool(String key) {
+    public Boolean bool(String key) throws AbstractCoercingException {
         return query(key).bool();
     }
 
-    public Number number(String key) {
+    public Number number(String key) throws AbstractCoercingException {
         return query(key).number();
     }
 
-    public AbstractObject object(String key, AbstractObject orElse) {
+    public AbstractObject object(String key, AbstractObject orElse) throws AbstractCoercingException {
         return query(key, orElse).object();
     }
 
-    public AbstractArray array(String key, AbstractArray orElse) {
+    public AbstractArray array(String key, AbstractArray orElse) throws AbstractCoercingException {
         return query(key, orElse).array();
     }
 
-    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) {
+    public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) throws AbstractCoercingException {
         return query(key, orElse).primitive();
     }
 
-    public String string(String key, String orElse) {
+    public String string(String key, String orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).string();
     }
 
-    public Boolean bool(String key, Boolean orElse) {
+    public Boolean bool(String key, Boolean orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).bool();
     }
 
-    public Number number(String key, Number orElse) {
+    public Number number(String key, Number orElse) throws AbstractCoercingException {
         return query(key, new AbstractPrimitive(orElse)).number();
     }
 
-    public AbstractObject object(int index) {
+    public AbstractObject object(int index) throws AbstractCoercingException {
         return get(index).object();
     }
 
-    public AbstractArray array(int index) {
+    public AbstractArray array(int index) throws AbstractCoercingException {
         return get(index).array();
     }
 
-    public AbstractPrimitive primitive(int index) {
+    public AbstractPrimitive primitive(int index) throws AbstractCoercingException {
         return get(index).primitive();
     }
 
-    public String string(int index) {
+    public String string(int index) throws AbstractCoercingException {
         return get(index).string();
     }
 
-    public Boolean bool(int index) {
+    public Boolean bool(int index) throws AbstractCoercingException {
         return get(index).bool();
     }
 
-    public Number number(int index) {
+    public Number number(int index) throws AbstractCoercingException {
         return get(index).number();
     }
 
-    public AbstractObject object(int index, AbstractObject orElse) {
+    public AbstractObject object(int index, AbstractObject orElse) throws AbstractCoercingException {
         return get(index, orElse).object();
     }
 
-    public AbstractArray array(int index, AbstractArray orElse) {
+    public AbstractArray array(int index, AbstractArray orElse) throws AbstractCoercingException {
         return get(index, orElse).array();
     }
 
-    public AbstractPrimitive primitive(int index, AbstractPrimitive orElse) {
+    public AbstractPrimitive primitive(int index, AbstractPrimitive orElse) throws AbstractCoercingException {
         return get(index, orElse).primitive();
     }
 
-    public String string(int index, String orElse) {
+    public String string(int index, String orElse) throws AbstractCoercingException {
         return get(index, new AbstractPrimitive(orElse)).string();
     }
 
-    public Boolean bool(int index, Boolean orElse) {
+    public Boolean bool(int index, Boolean orElse) throws AbstractCoercingException {
         return get(index, new AbstractPrimitive(orElse)).bool();
     }
 
-    public Number number(int index, Number orElse) {
+    public Number number(int index, Number orElse) throws AbstractCoercingException {
         return get(index, new AbstractPrimitive(orElse)).number();
     }
 
     public AbstractArray add(AbstractElement element) {
         if (element == null)
-            element = AbstractNull.INSTANCE;
+            element = AbstractNull.VALUE;
         elements.add(element);
         return this;
     }
@@ -141,7 +151,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractArray addNull() {
-        return add(AbstractNull.INSTANCE);
+        return add(AbstractNull.VALUE);
     }
 
     public AbstractArray add(Number value) {
@@ -163,7 +173,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractArray setNull(int i) {
-        return set(i, AbstractNull.INSTANCE);
+        return set(i, AbstractNull.VALUE);
     }
 
     public AbstractArray set(int i, AbstractElement element) {

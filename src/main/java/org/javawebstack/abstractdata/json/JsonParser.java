@@ -82,7 +82,7 @@ public class JsonParser {
                 if(stack.peek() != 'l')
                     return null;
                 stack.pop();
-                return AbstractNull.INSTANCE;
+                return AbstractNull.VALUE;
             }
             case '0':
             case '1':

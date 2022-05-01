@@ -3,6 +3,7 @@ package org.javawebstack.abstractdata;
 import org.bson.BsonValue;
 import org.javawebstack.abstractdata.bson.BsonConverter;
 import org.javawebstack.abstractdata.bson.BsonTypeAdapter;
+import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 import org.javawebstack.abstractdata.json.JsonDumper;
 import org.javawebstack.abstractdata.json.JsonParser;
 import org.javawebstack.abstractdata.util.QueryString;
@@ -46,34 +47,48 @@ public interface AbstractElement {
         return false;
     }
 
-    default AbstractPrimitive primitive() {
-        return null;
+    default AbstractPrimitive primitive() throws AbstractCoercingException {
+        throw new AbstractCoercingException("PRIMITIVE", getType());
     }
 
-    default AbstractArray array() {
-        return null;
+    default AbstractArray array() throws AbstractCoercingException {
+        return array(false);
     }
 
-    default AbstractObject object() {
-        return null;
+    default AbstractObject object() throws AbstractCoercingException {
+        return object(false);
     }
 
-    default String string() {
-        if (!isString())
-            return null;
-        return primitive().string();
+    default AbstractArray array(boolean strict) throws AbstractCoercingException {
+        throw new AbstractCoercingException("ARRAY", getType());
     }
 
-    default Boolean bool() {
-        if (!isBoolean())
-            return null;
-        return primitive().bool();
+    default AbstractObject object(boolean strict) throws AbstractCoercingException {
+        throw new AbstractCoercingException("OBJECT", getType());
     }
 
-    default Number number() {
-        if (!isNumber())
-            return null;
-        return primitive().number();
+    default String string() throws AbstractCoercingException {
+        return string(false);
+    }
+
+    default Boolean bool() throws AbstractCoercingException {
+        return bool(false);
+    }
+
+    default Number number() throws AbstractCoercingException {
+        return number(false);
+    }
+
+    default String string(boolean strict) throws AbstractCoercingException {
+        return primitive().string(strict);
+    }
+
+    default Boolean bool(boolean strict) throws AbstractCoercingException {
+        return primitive().bool(strict);
+    }
+
+    default Number number(boolean strict) throws AbstractCoercingException {
+        return primitive().number(strict);
     }
 
     default BsonValue toBson() {
@@ -131,7 +146,7 @@ public interface AbstractElement {
 
     static AbstractElement fromAbstractObject(Object object) {
         if (object == null)
-            return AbstractNull.INSTANCE;
+            return AbstractNull.VALUE;
         if (object instanceof List) {
             List<Object> list = (List<Object>) object;
             AbstractArray array = new AbstractArray();
@@ -150,7 +165,7 @@ public interface AbstractElement {
             return new AbstractPrimitive((String) object);
         if (object instanceof Boolean)
             return new AbstractPrimitive((Boolean) object);
-        return AbstractNull.INSTANCE;
+        return AbstractNull.VALUE;
     }
 
     default QueryString toFormData() {
