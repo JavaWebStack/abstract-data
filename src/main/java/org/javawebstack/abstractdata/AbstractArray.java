@@ -274,6 +274,28 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return list;
     }
 
+    public List<String> toStringList() {
+        return toStringList(false);
+    }
+
+    public List<String> toStringList(boolean strict) {
+        List<String> list = new ArrayList<>();
+        for(AbstractElement e : elements)
+            list.add(e.string(strict));
+        return list;
+    }
+
+    public List<AbstractObject> toObjectList() {
+        return toObjectList(false);
+    }
+
+    public List<AbstractObject> toObjectList(boolean strict) {
+        List<AbstractObject> list = new ArrayList<>();
+        for(AbstractElement e : elements)
+            list.add(e.object(strict));
+        return list;
+    }
+
     public static AbstractArray fromArray(Object[] objects) {
         return new AbstractArray(objects);
     }
