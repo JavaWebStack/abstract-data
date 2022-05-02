@@ -65,8 +65,20 @@ public class AbstractObject implements AbstractElement {
         return true;
     }
 
-    public AbstractObject object() {
+    public AbstractObject object(boolean strict) throws AbstractCoercingException {
         return this;
+    }
+
+    public AbstractArray array(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
+        AbstractArray array = new AbstractArray();
+        for (int i = 0; i < size(); i++) {
+            if (!has(String.valueOf(i)))
+                throw new AbstractCoercingException(Type.ARRAY, this);
+            array.add(get(String.valueOf(i)));
+        }
+        return array;
     }
 
     public AbstractElement get(String key) {
@@ -125,18 +137,6 @@ public class AbstractObject implements AbstractElement {
 
     public int size() {
         return entries.size();
-    }
-
-    public AbstractArray array(boolean strict) throws AbstractCoercingException {
-        if(strict)
-            throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
-        AbstractArray array = new AbstractArray();
-        for (int i = 0; i < size(); i++) {
-            if (!has(String.valueOf(i)))
-                throw new AbstractCoercingException(Type.ARRAY, this);
-            array.add(get(String.valueOf(i)));
-        }
-        return array;
     }
 
     public AbstractObject object(String key) throws AbstractCoercingException {
