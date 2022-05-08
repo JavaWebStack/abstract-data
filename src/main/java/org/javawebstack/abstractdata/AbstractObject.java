@@ -65,8 +65,20 @@ public class AbstractObject implements AbstractElement {
         return true;
     }
 
-    public AbstractObject object() {
+    public AbstractObject object(boolean strict) throws AbstractCoercingException {
         return this;
+    }
+
+    public AbstractArray array(boolean strict) throws AbstractCoercingException {
+        if(strict)
+            throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
+        AbstractArray array = new AbstractArray();
+        for (int i = 0; i < size(); i++) {
+            if (!has(String.valueOf(i)))
+                throw new AbstractCoercingException(Type.ARRAY, this);
+            array.add(get(String.valueOf(i)));
+        }
+        return array;
     }
 
     public AbstractElement get(String key) {
@@ -91,6 +103,8 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractElement query(String query, AbstractElement orElse) {
+        if(orElse == null)
+            orElse = AbstractNull.VALUE;
         AbstractElement value = query(query);
         return (value != null && !value.isNull()) ? value : orElse;
     }
@@ -127,18 +141,6 @@ public class AbstractObject implements AbstractElement {
         return entries.size();
     }
 
-    public AbstractArray array(boolean strict) throws AbstractCoercingException {
-        if(strict)
-            throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
-        AbstractArray array = new AbstractArray();
-        for (int i = 0; i < size(); i++) {
-            if (!has(String.valueOf(i)))
-                throw new AbstractCoercingException(Type.ARRAY, this);
-            array.add(get(String.valueOf(i)));
-        }
-        return array;
-    }
-
     public AbstractObject object(String key) throws AbstractCoercingException {
         return query(key, AbstractNull.VALUE).object();
     }
@@ -168,7 +170,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public String string(String key, String orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).string();
+        return query(key, orElse == null ? AbstractNull.VALUE : new AbstractPrimitive(orElse)).string();
     }
 
     public Boolean bool(String key) throws AbstractCoercingException {
@@ -176,7 +178,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public Boolean bool(String key, Boolean orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).bool();
+        return query(key, orElse == null ? AbstractNull.VALUE : new AbstractPrimitive(orElse)).bool();
     }
 
     public Number number(String key) throws AbstractCoercingException {
@@ -184,7 +186,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public Number number(String key, Number orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).number();
+        return query(key, orElse == null ? AbstractNull.VALUE : new AbstractPrimitive(orElse)).number();
     }
 
     public Object toObject() {
