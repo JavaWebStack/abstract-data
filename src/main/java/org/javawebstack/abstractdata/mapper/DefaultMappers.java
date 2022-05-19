@@ -273,14 +273,14 @@ public final class DefaultMappers {
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
             try {
                 DateFormat df = context.getAnnotation(DateFormat.class);
-                java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
                 Date date;
-                try {
+                if(df != null && df.epoch()) {
                     long time = element.number(context.getMapper().isStrict()).longValue();
-                    if(df != null && !df.millis())
+                    if(!df.millis())
                         time *= 1000;
                     date = new Date(time);
-                } catch (AbstractCoercingException ex) {
+                } else {
+                    java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
                     date = dateFormat.parse(element.string(context.getMapper().isStrict()));
                 }
                 if(type.equals(Date.class))
