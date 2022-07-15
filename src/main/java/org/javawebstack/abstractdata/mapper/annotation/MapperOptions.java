@@ -18,5 +18,5 @@ public @interface MapperOptions {
     boolean hidden() default false;
     boolean omitNull() default true;
     Class<? extends MapperTypeAdapter> adapter() default MapperTypeAdapter.class;
-
+    Attribute[] attributes() default {};
 }

@@ -7,6 +7,7 @@ import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 import org.javawebstack.abstractdata.json.JsonDumper;
 import org.javawebstack.abstractdata.json.JsonParser;
 import org.javawebstack.abstractdata.util.QueryString;
+import org.javawebstack.abstractdata.xml.XmlDumper;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -105,6 +106,14 @@ public interface AbstractElement {
 
     default String toJsonString() {
         return toJsonString(false);
+    }
+
+    default String toXmlString(boolean pretty, boolean header) {
+        return new XmlDumper().setPretty(pretty).setHeader(header).dump(this);
+    }
+
+    default String toXmlString() {
+        return toXmlString(false, true);
     }
 
     Object toObject();
