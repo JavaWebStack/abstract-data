@@ -4,6 +4,7 @@ import org.javawebstack.abstractdata.collector.AbstractArrayCollector;
 import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -321,6 +322,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public Map<String, Object> toTree(String keySeparator) {
         return object().toTree(keySeparator);
+    }
+
+    public AbstractArray use(Consumer<AbstractArray> consumer) {
+        consumer.accept(this);
+        return this;
     }
 
     public AbstractElement clone() {
