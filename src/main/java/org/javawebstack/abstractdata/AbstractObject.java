@@ -233,6 +233,12 @@ public class AbstractObject implements AbstractElement {
         return tree;
     }
 
+    public Map<String, Object> toTree(String keySeparator) {
+        Map<String, Object> tree = new HashMap<>();
+        toTree().forEach((k, v) -> tree.put(String.join(keySeparator, k), v));
+        return tree;
+    }
+
     public Set<String> keys() {
         return entries.keySet();
     }
