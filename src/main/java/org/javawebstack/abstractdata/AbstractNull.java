@@ -19,20 +19,22 @@ public class AbstractNull implements AbstractElement {
     }
 
     public String string(boolean strict) throws AbstractCoercingException {
-        if(strict)
-            throw new AbstractCoercingException(Type.STRING, Type.NULL);
         return null;
     }
 
     public Boolean bool(boolean strict) throws AbstractCoercingException {
-        if(strict)
-            throw new AbstractCoercingException(Type.STRING, Type.NULL);
         return null;
     }
 
     public Number number(boolean strict) throws AbstractCoercingException {
-        if(strict)
-            throw new AbstractCoercingException(Type.STRING, Type.NULL);
+        return null;
+    }
+
+    public AbstractObject object(boolean strict) throws AbstractCoercingException {
+        return null;
+    }
+
+    public AbstractArray array(boolean strict) throws AbstractCoercingException {
         return null;
     }
 

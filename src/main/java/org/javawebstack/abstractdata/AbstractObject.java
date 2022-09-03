@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -231,6 +232,17 @@ public class AbstractObject implements AbstractElement {
             tree.put(k, v);
         }));
         return tree;
+    }
+
+    public Map<String, Object> toTree(String keySeparator) {
+        Map<String, Object> tree = new HashMap<>();
+        toTree().forEach((k, v) -> tree.put(String.join(keySeparator, k), v));
+        return tree;
+    }
+
+    public AbstractObject use(Consumer<AbstractObject> consumer) {
+        consumer.accept(this);
+        return this;
     }
 
     public Set<String> keys() {
