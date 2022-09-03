@@ -2,6 +2,9 @@ package org.javawebstack.abstractdata;
 
 import org.javawebstack.abstractdata.mapper.Mapper;
 
+/**
+ * @deprecated will be removed in the next release, replaced by org.javawebstack.abstractdata.mapper.Mapper
+ */
 @Deprecated
 public class AbstractMapper {
 
