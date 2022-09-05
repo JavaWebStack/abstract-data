@@ -360,8 +360,17 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return true;
     }
 
-    public AbstractArray concat(AbstractArray array) {
+    public AbstractArray addAll(AbstractArray array) {
         elements.addAll(array.elements);
         return this;
+    }
+
+    public AbstractArray concat(AbstractArray... array) {
+        AbstractArray newArr = new AbstractArray();
+        newArr.addAll(this);
+        for (AbstractArray arr : array)
+            newArr.add(arr);
+
+        return newArr;
     }
 }
