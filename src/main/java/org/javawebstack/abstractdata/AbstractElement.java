@@ -245,4 +245,6 @@ public interface AbstractElement {
             return this == NUMBER || this == BOOLEAN || this == STRING;
         }
     }
+
+    boolean equals(Object obj, boolean strict);
 }

@@ -175,7 +175,7 @@ public class AbstractPrimitive implements AbstractElement {
         return from(value);
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
         if (!(obj instanceof AbstractPrimitive))
@@ -183,12 +183,16 @@ public class AbstractPrimitive implements AbstractElement {
 
         AbstractPrimitive primitive = (AbstractPrimitive) obj;
         if (isBoolean() && primitive.isBoolean())
-            return bool().equals(primitive.bool());
+            return bool(strict).equals(primitive.bool(strict));
         if (isNumber() && primitive.isNumber())
-            return number().equals(primitive.number());
+            return number(strict).equals(primitive.number(strict));
         if (isString() && primitive.isString())
-            return string().equals(primitive.string());
+            return string(strict).equals(primitive.string(strict));
 
         return false;
+    }
+
+    public boolean equals (Object obj) {
+        return equals(obj, false);
     }
 }

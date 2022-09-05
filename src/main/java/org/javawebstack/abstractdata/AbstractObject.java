@@ -267,7 +267,7 @@ public class AbstractObject implements AbstractElement {
         return new AbstractObjectCollector<>(keyFunction, valueFunction);
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
         if (!(obj instanceof AbstractObject))
@@ -279,10 +279,14 @@ public class AbstractObject implements AbstractElement {
         for (String key : keys()) {
             if (!object.has(key))
                 return false;
-            if (!object.get(key).equals(get(key)))
+            if (!object.get(key).equals(get(key), strict))
                 return false;
         }
 
         return true;
+    }
+
+    public boolean equals (Object obj) {
+        return equals(obj, false);
     }
 }

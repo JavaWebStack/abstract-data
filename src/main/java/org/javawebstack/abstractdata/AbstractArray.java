@@ -343,7 +343,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return new AbstractArrayCollector<>(e -> e);
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
         if (!(obj instanceof AbstractArray))
@@ -353,11 +353,15 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
             return false;
 
         for (int i = 0; i < size(); i++) {
-            if (!(get(i).equals(arr.get(i))))
+            if (!(get(i).equals(arr.get(i), strict)))
                 return false;
         }
 
         return true;
+    }
+
+    public boolean equals (Object obj) {
+        return equals(obj, false);
     }
 
     public AbstractArray addAll(AbstractArray array) {
