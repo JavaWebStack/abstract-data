@@ -175,4 +175,20 @@ public class AbstractPrimitive implements AbstractElement {
         return from(value);
     }
 
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof AbstractPrimitive))
+            return false;
+
+        AbstractPrimitive primitive = (AbstractPrimitive) obj;
+        if (isBoolean() && primitive.isBoolean())
+            return bool().equals(primitive.bool());
+        if (isNumber() && primitive.isNumber())
+            return number().equals(primitive.number());
+        if (isString() && primitive.isString())
+            return string().equals(primitive.string());
+
+        return false;
+    }
 }

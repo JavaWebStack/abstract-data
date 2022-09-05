@@ -245,5 +245,4 @@ public interface AbstractElement {
             return this == NUMBER || this == BOOLEAN || this == STRING;
         }
     }
-
 }

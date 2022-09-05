@@ -343,4 +343,20 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return new AbstractArrayCollector<>(e -> e);
     }
 
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof AbstractArray))
+            return false;
+        AbstractArray arr = (AbstractArray) obj;
+        if (arr.size() != arr.size())
+            return false;
+
+        for (int i = 0; i < size(); i++) {
+            if (!(get(i).equals(arr.get(i))))
+                return false;
+        }
+
+        return true;
+    }
 }

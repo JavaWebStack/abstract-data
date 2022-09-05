@@ -55,4 +55,8 @@ public class AbstractNull implements AbstractElement {
     public Type getType() {
         return Type.NULL;
     }
+
+    public boolean equals(Object obj) {
+        return obj == null || obj instanceof AbstractNull;
+    }
 }
