@@ -361,9 +361,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractArray concat(AbstractArray array) {
-        for (AbstractElement element : array)
-            add(element);
-
+        elements.addAll(array.elements);
         return this;
     }
 }
