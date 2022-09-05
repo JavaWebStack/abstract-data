@@ -359,4 +359,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
         return true;
     }
+
+    public AbstractArray concat(AbstractArray array) {
+        for (AbstractElement element : array)
+            add(element);
+
+        return this;
+    }
 }
