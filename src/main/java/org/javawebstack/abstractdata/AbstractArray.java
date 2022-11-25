@@ -343,4 +343,41 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return new AbstractArrayCollector<>(e -> e);
     }
 
+    public boolean equals(Object obj, boolean strict) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof AbstractElement))
+            return false;
+        try {
+            AbstractArray arr = ((AbstractElement) obj).array(strict);
+            if (arr.size() != arr.size())
+                return false;
+
+            for (int i = 0; i < size(); i++) {
+                if (!(get(i).equals(arr.get(i), strict)))
+                    return false;
+            }
+            return true;
+        } catch (AbstractCoercingException ignored) {
+            return false;
+        }
+    }
+
+    public boolean equals (Object obj) {
+        return equals(obj, false);
+    }
+
+    public AbstractArray addAll(AbstractArray array) {
+        elements.addAll(array.elements);
+        return this;
+    }
+
+    public AbstractArray concat(AbstractArray... array) {
+        AbstractArray newArr = new AbstractArray();
+        newArr.addAll(this);
+        for (AbstractArray arr : array)
+            newArr.addAll(arr);
+
+        return newArr;
+    }
 }
