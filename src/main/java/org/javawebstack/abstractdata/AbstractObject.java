@@ -270,8 +270,13 @@ public class AbstractObject implements AbstractElement {
     public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
-        if (!(obj instanceof AbstractObject))
-            return false;
+        if (!(obj instanceof AbstractObject)) {
+            if (strict)
+                return false;
+            
+            obj = AbstractElement.fromAbstractObject(obj).object();
+        }
+
         AbstractObject object = (AbstractObject) obj;
         if (size() != object.size())
             return false;

@@ -178,8 +178,12 @@ public class AbstractPrimitive implements AbstractElement {
     public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
-        if (!(obj instanceof AbstractPrimitive))
-            return false;
+        if (!(obj instanceof AbstractPrimitive)) {
+            if (strict)
+                return false;
+
+            obj = AbstractElement.fromAbstractObject(obj).primitive();
+        }
 
         AbstractPrimitive primitive = (AbstractPrimitive) obj;
         if (isBoolean() && primitive.isBoolean())
