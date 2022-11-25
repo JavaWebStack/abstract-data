@@ -346,23 +346,21 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     public boolean equals(Object obj, boolean strict) {
         if (obj == null)
             return false;
-        if (!(obj instanceof AbstractArray)) {
-            if (strict)
-                return false;
-
-            obj = AbstractElement.fromAbstractObject(obj).array();
-        }
-
-        AbstractArray arr = (AbstractArray) obj;
-        if (arr.size() != arr.size())
+        if (!(obj instanceof AbstractElement))
             return false;
-
-        for (int i = 0; i < size(); i++) {
-            if (!(get(i).equals(arr.get(i), strict)))
+        try {
+            AbstractArray arr = ((AbstractElement) obj).array(strict);
+            if (arr.size() != arr.size())
                 return false;
-        }
 
-        return true;
+            for (int i = 0; i < size(); i++) {
+                if (!(get(i).equals(arr.get(i), strict)))
+                    return false;
+            }
+            return true;
+        } catch (AbstractCoercingException ignored) {
+            return false;
+        }
     }
 
     public boolean equals (Object obj) {

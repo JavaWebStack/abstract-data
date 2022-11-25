@@ -44,12 +44,12 @@
         <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
-            <version>1.30</version>
+            <version>1.33</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>bson</artifactId>
-            <version>4.6.0</version>
+            <version>4.7.1</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
