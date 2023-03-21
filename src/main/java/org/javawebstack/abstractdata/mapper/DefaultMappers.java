@@ -378,7 +378,7 @@ public final class DefaultMappers {
                 try {
                     return Enum.valueOf(type, element.string());
                 } catch (IllegalArgumentException ex) {
-                    throw new MapperException("There is no enum constant '" + element.string() + "'");
+                    throw new MapperException("There is no enum constant '" + element.string() + "' in '" + type.getName() + "'");
                 }
             }
             if(type.equals(UUID.class))
