@@ -9,6 +9,7 @@ import org.javawebstack.abstractdata.util.Helpers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -253,6 +254,8 @@ public final class DefaultMappers {
                     return new AbstractPrimitive(time);
                 }
                 java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
+                if (df != null && df.timezone().length() > 0)
+                    dateFormat.setTimeZone(TimeZone.getTimeZone(df.timezone()));
                 return new AbstractPrimitive(dateFormat.format((Date) value));
             }
             return null;
@@ -269,6 +272,8 @@ public final class DefaultMappers {
                     date = new Date(time);
                 } else {
                     java.text.DateFormat dateFormat = (df != null && df.value().length() > 0) ? new SimpleDateFormat(df.value()) : context.getMapper().getDateFormat();
+                    if (df != null && df.timezone().length() > 0)
+                        dateFormat.setTimeZone(TimeZone.getTimeZone(df.timezone()));
                     date = dateFormat.parse(element.string(context.getMapper().isStrict()));
                 }
                 if (type.equals(Date.class))
@@ -367,7 +372,7 @@ public final class DefaultMappers {
                 try {
                     return Enum.valueOf(type, element.string());
                 } catch (IllegalArgumentException ex) {
-                    throw new MapperException("There is no enum constant '" + element.string() + "'");
+                    throw new MapperException("There is no enum constant '" + element.string() + "' in '" + type.getName() + "'");
                 }
             }
             if (type.equals(UUID.class))
