@@ -352,6 +352,8 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
             AbstractArray arr = ((AbstractElement) obj).array(strict);
             if (size() != arr.size())
                 return false;
+            if (size() == 0 || arr.size() == 0)
+                return false;
 
             for (int i = 0; i < size(); i++) {
                 if (!(get(i).equals(arr.get(i), strict)))
