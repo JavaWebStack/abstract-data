@@ -22,6 +22,6 @@ You can find the current docs on our [website](https://docs.javawebstack.org/fra
 <dependency>
     <groupId>org.javawebstack</groupId>
     <artifactId>abstract-data</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 </dependency>
 ```
