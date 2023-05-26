@@ -246,4 +246,5 @@ public interface AbstractElement {
         }
     }
 
+    boolean equals(Object obj, boolean strict);
 }

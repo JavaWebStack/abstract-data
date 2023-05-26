@@ -267,4 +267,28 @@ public class AbstractObject implements AbstractElement {
         return new AbstractObjectCollector<>(keyFunction, valueFunction);
     }
 
+    public boolean equals(Object obj, boolean strict) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof AbstractElement))
+            return false;
+        try {
+            AbstractObject object = ((AbstractElement) obj).object(strict);
+            if (size() != object.size())
+                return false;
+            for (String key : keys()) {
+                if (!object.has(key))
+                    return false;
+                if (!object.get(key).equals(get(key), strict))
+                    return false;
+            }
+            return true;
+        } catch (AbstractCoercingException ignored) {
+            return false;
+        }
+    }
+
+    public boolean equals (Object obj) {
+        return equals(obj, false);
+    }
 }
