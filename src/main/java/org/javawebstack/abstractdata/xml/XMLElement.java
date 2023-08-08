@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class XMLElement implements XMLNode {
@@ -13,11 +14,15 @@ public class XMLElement implements XMLNode {
     private final List<XMLNode> childNodes = new ArrayList<>();
 
     public XMLElement(String tagName) {
+        if(tagName == null)
+            throw new IllegalArgumentException("tagName can not be null");
         this.tagName = tagName;
     }
 
     public XMLElement(String tagName, String text) {
-        this(text);
+        this(tagName);
+        if(text == null)
+            throw new IllegalArgumentException("text can not be null");
         text(text);
     }
 
@@ -65,6 +70,12 @@ public class XMLElement implements XMLNode {
 
     public XMLElement child(XMLNode childNode) {
         childNodes.add(childNode);
+        return this;
+    }
+
+    public XMLElement onlyIf(boolean condition, Consumer<XMLElement> fn) {
+        if(condition)
+            fn.accept(this);
         return this;
     }
 
