@@ -9,7 +9,6 @@ import org.javawebstack.abstractdata.util.Helpers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +27,7 @@ public final class DefaultMappers {
     public static final FallbackMapper FALLBACK = new FallbackMapper();
 
     public static Map<Class<?>, MapperTypeAdapter> create() {
-        Map<Class<?>, MapperTypeAdapter> map = new HashMap<>();
+        Map<Class<?>, MapperTypeAdapter> map = new LinkedHashMap<>();
 
         for (MapperTypeAdapter adapter : new MapperTypeAdapter[]{
                 ABSTRACT,
@@ -64,20 +63,20 @@ public final class DefaultMappers {
                 }
                 if (type.equals(char.class) || type.equals(Character.class)) {
                     if (type.isPrimitive() && element.isNull())
-                        throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                        throw new MapperWrongTypeException(context.getFieldName(), "number", "null");
                     String s = element.string(context.getMapper().isStrict());
                     if (s.length() != 1)
-                        throw new MapperException("Expected string of length 1 for field " + context.getField().getName() + " but received " + s.length());
+                        throw new MapperException("Expected string of length 1 for field " + context.getFieldName() + " but received " + s.length());
                     return s.charAt(0);
                 }
                 if (type.equals(Boolean.class) || type.equals(boolean.class)) {
                     if (type.isPrimitive() && element.isNull())
-                        throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                        throw new MapperWrongTypeException(context.getFieldName(), "number", "null");
                     return element.bool(context.getMapper().isStrict());
                 }
                 if (Number.class.isAssignableFrom(type) || type.isPrimitive()) {
                     if (type.isPrimitive() && element.isNull())
-                        throw new MapperWrongTypeException(context.getField().getName(), "number", "null");
+                        throw new MapperWrongTypeException(context.getFieldName(), "number", "null");
                     if (type.equals(int.class) || type.equals(Integer.class))
                         return element.number(context.getMapper().isStrict()).intValue();
                     if (type.equals(long.class) || type.equals(Long.class))
@@ -95,9 +94,9 @@ public final class DefaultMappers {
                     return element.number(context.getMapper().isStrict());
                 }
             } catch (AbstractCoercingException ex) {
-                throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getField() != null ? context.getFieldName() : "", "string", Helpers.typeName(element));
             }
-            throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
+            throw new MapperWrongTypeException(context.getFieldName(), "primitive", Helpers.typeName(element));
         }
 
         public Class<?>[] getSupportedTypes() {
@@ -136,7 +135,7 @@ public final class DefaultMappers {
         }
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
-            if (type.equals(List.class) || type.equals(AbstractList.class))
+            if (type.equals(List.class) || type.equals(Collection.class) || type.equals(AbstractList.class))
                 type = ArrayList.class;
             if (type.equals(Set.class))
                 type = HashSet.class;
@@ -157,12 +156,13 @@ public final class DefaultMappers {
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (AbstractCoercingException ex) {
-                throw new MapperWrongTypeException(context.getField().getName(), "array", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "array", Helpers.typeName(element));
             }
         }
 
         public Class<?>[] getSupportedTypes() {
             return new Class[]{
+                    Collection.class,
                     List.class,
                     ArrayList.class,
                     CopyOnWriteArrayList.class,
@@ -216,7 +216,7 @@ public final class DefaultMappers {
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (AbstractCoercingException ex) {
-                throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "object", Helpers.typeName(element));
             }
         }
 
@@ -284,7 +284,7 @@ public final class DefaultMappers {
                     return new Timestamp(date.getTime());
                 throw new MapperException("Unsupported date type '" + type.getName() + "'");
             } catch (ParseException | NumberFormatException | AbstractCoercingException ex) {
-                throw new MapperException("Failed to parse date '" + element.string() + "'" + (context.getField() != null ? (" for field '" + context.getField().getName() + "'") : ""));
+                throw new MapperException("Failed to parse date '" + element.string() + "'" + (context.getField() != null ? (" for field '" + context.getFieldName() + "'") : ""));
             }
         }
 
@@ -311,13 +311,13 @@ public final class DefaultMappers {
             if (type.equals(AbstractElement.class))
                 return element;
             if (type.equals(AbstractNull.class) && !(element instanceof AbstractNull))
-                throw new MapperWrongTypeException(context.getField().getName(), "null", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "null", Helpers.typeName(element));
             if (type.equals(AbstractPrimitive.class) && !(element instanceof AbstractPrimitive))
-                throw new MapperWrongTypeException(context.getField().getName(), "primitive", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "primitive", Helpers.typeName(element));
             if (type.equals(AbstractObject.class) && !(element instanceof AbstractObject))
-                throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "object", Helpers.typeName(element));
             if (type.equals(AbstractArray.class) && !(element instanceof AbstractArray))
-                throw new MapperWrongTypeException(context.getField().getName(), "array", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "array", Helpers.typeName(element));
             return element;
         }
 
@@ -368,7 +368,7 @@ public final class DefaultMappers {
         public Object fromAbstract(MapperContext context, AbstractElement element, Class type) throws MapperException {
             if (type.isEnum()) {
                 if (!element.isString())
-                    throw new MapperWrongTypeException(context.getField().getName(), "string", Helpers.typeName(element));
+                    throw new MapperWrongTypeException(context.getFieldName(), "string", Helpers.typeName(element));
                 try {
                     return Enum.valueOf(type, element.string());
                 } catch (IllegalArgumentException ex) {
@@ -378,7 +378,7 @@ public final class DefaultMappers {
             if (type.equals(UUID.class))
                 return UUID.fromString(element.string());
             if (!element.isObject())
-                throw new MapperWrongTypeException(context.getField().getName(), "object", Helpers.typeName(element));
+                throw new MapperWrongTypeException(context.getFieldName(), "object", Helpers.typeName(element));
             MapperTypeSpec spec = MapperTypeSpec.get(type);
             if (spec == null)
                 throw new MapperException("Unmappable type '" + type.getName() + "'");

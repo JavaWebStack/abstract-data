@@ -41,7 +41,19 @@ public class Mapper {
         }
         if(context.getAdapter() != null)
             return (T) context.getAdapter().fromAbstract(context, element, type);
-        return (T) adapters.getOrDefault(type, DefaultMappers.FALLBACK).fromAbstract(context, element, type);
+        return (T) findAdapter(type).fromAbstract(context, element, type);
+    }
+
+    private MapperTypeAdapter findAdapter(Class<?> type) {
+        MapperTypeAdapter adapter = adapters.get(type);
+        if(adapter != null)
+            return adapter;
+        for(Class<?> t : adapters.keySet()) {
+            if(t.isAssignableFrom(type)) {
+                return adapters.get(t);
+            }
+        }
+        return DefaultMappers.FALLBACK;
     }
 
     public AbstractElement map(Object obj) throws MapperException {
@@ -59,7 +71,7 @@ public class Mapper {
         }
         if(context.getAdapter() != null)
             return context.getAdapter().toAbstract(context, obj);
-        return adapters.getOrDefault(obj.getClass(), DefaultMappers.FALLBACK).toAbstract(context, obj);
+        return findAdapter(obj.getClass()).toAbstract(context, obj);
     }
 
     public Mapper strict() {

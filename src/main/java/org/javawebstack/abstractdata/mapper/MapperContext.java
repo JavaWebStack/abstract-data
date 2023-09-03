@@ -34,6 +34,10 @@ public class MapperContext {
         return field;
     }
 
+    public String getFieldName() {
+        return field != null ? field.getName() : null;
+    }
+
     public boolean isNested() {
         return field != null;
     }
