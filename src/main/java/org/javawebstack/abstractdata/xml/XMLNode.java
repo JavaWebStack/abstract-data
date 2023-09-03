@@ -10,4 +10,12 @@ public interface XMLNode {
         return new XMLDumper().setPretty(pretty).dump(this);
     }
 
+    default XMLElement asElement() {
+        return (XMLElement) this;
+    }
+
+    default XMLTextNode asTextNode() {
+        return (XMLTextNode) this;
+    }
+
 }

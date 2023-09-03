@@ -49,6 +49,10 @@ public class XMLElement implements XMLNode {
         return this;
     }
 
+    public String attr(String name) {
+        return attributes.get(name);
+    }
+
     public XMLElement attr(String name, String value) {
         if(value == null) {
             attributes.remove(name);
@@ -85,6 +89,10 @@ public class XMLElement implements XMLNode {
 
     public List<XMLNode> getChildNodes() {
         return childNodes;
+    }
+
+    public static XMLElement from(String xmlString) {
+        return new XMLParser().parse(xmlString);
     }
 
 }
