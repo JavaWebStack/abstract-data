@@ -9,7 +9,6 @@ import org.javawebstack.abstractdata.util.Helpers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,7 +27,7 @@ public final class DefaultMappers {
     public static final FallbackMapper FALLBACK = new FallbackMapper();
 
     public static Map<Class<?>, MapperTypeAdapter> create() {
-        Map<Class<?>, MapperTypeAdapter> map = new HashMap<>();
+        Map<Class<?>, MapperTypeAdapter> map = new LinkedHashMap<>();
 
         for (MapperTypeAdapter adapter : new MapperTypeAdapter[]{
                 ABSTRACT,
@@ -136,7 +135,7 @@ public final class DefaultMappers {
         }
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
-            if (type.equals(List.class) || type.equals(AbstractList.class))
+            if (type.equals(List.class) || type.equals(Collection.class) || type.equals(AbstractList.class))
                 type = ArrayList.class;
             if (type.equals(Set.class))
                 type = HashSet.class;
@@ -163,6 +162,7 @@ public final class DefaultMappers {
 
         public Class<?>[] getSupportedTypes() {
             return new Class[]{
+                    Collection.class,
                     List.class,
                     ArrayList.class,
                     CopyOnWriteArrayList.class,
