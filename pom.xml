@@ -113,7 +113,7 @@
                             <goal>sign</goal>
                         </goals>
                         <configuration>
-                            <keyname>A313520526A8DFE1C2A30399C35A3D43C557B112</keyname>
+                            <keyname>6802C125C9069802B97A080910CE6063CEE9C47B</keyname>
                             <passphraseServerId>gpg</passphraseServerId>
                             <gpgArguments>
                                 <arg>--no-tty</arg>
