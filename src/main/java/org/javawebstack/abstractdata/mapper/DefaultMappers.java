@@ -263,7 +263,7 @@ public final class DefaultMappers {
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
             try {
-                DateFormat df = context.getAnnotation(DateFormat.class);
+                DateFormat df = context.getField().getAnnotation(DateFormat.class);
                 Date date;
                 if (df != null && df.epoch()) {
                     long time = element.number(context.getMapper().isStrict()).longValue();
