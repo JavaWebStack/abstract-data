@@ -4,8 +4,7 @@ import org.javawebstack.abstractdata.AbstractArray;
 import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.abstractdata.AbstractObject;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /*
 {
@@ -39,41 +38,6 @@ import java.util.List;
 public class JsonSchemaParser {
 
     public static void main(String[] args) {
-        String schemaStr = "{\n" +
-                "    \"$id\": \"1224\",\n" +
-                "    \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n" +
-                "    \"title\": \"Person\",\n" +
-                "    \"type\": \"object\",\n" +
-                "    \"properties\": {\n" +
-                "        \"name\": {\n" +
-                "            \"type\": \"string\"\n" +
-                "        },\n" +
-                "        \"emails\": {\n" +
-                "            \"type\": \"array\"\n" +
-                "            \"minItems\": 1\n" +
-                "            \"items\": {\n" +
-                "                \"type\": \"string\"\n" +
-                "            }\n" +
-                "        },\n" +
-                "        \"age\": {\n" +
-                "            \"type\": \"integer\",\n" +
-                "            \"minimum\": 0,\n" +
-                "            \"maximum\": 120\n" +
-                "        }\n" +
-                "    },\n" +
-                "    \"required\": [\n" +
-                "        \"name\",\n" +
-                "        \"emails\"\n" +
-                "    ]\n" +
-                "}";
-        AbstractObject schemaObj = AbstractElement.fromJson(schemaStr).object();
-        AbstractSchema schema = new JsonSchemaParser().parse(schemaObj);
-        List<SchemaValidationError> errors = schema.validate(new AbstractObject()
-                .set("name", "Maher")
-                .set("emails", new AbstractArray())
-                .set("age", 123)
-        );
-        System.out.println();
 
     }
 
@@ -89,8 +53,12 @@ public class JsonSchemaParser {
                 case "string": {
                     return parseString(schema);
                 }
+                case "number":
                 case "integer": {
-                    return parseInteger(schema);
+                    return parseNumber(schema);
+                }
+                case "boolean": {
+                    return parseBoolean(schema);
                 }
                 default: {
                     throw new UnsupportedOperationException("Unknown type: " + schema.string("type"));
@@ -100,27 +68,76 @@ public class JsonSchemaParser {
         if(schema.has("$ref")) {
             throw new UnsupportedOperationException("$ref is currently not supported");
         }
+        if(schema.has("oneOf")){
+            return parseOneOf(schema);
+        }
         throw new IllegalArgumentException("Invalid json schema");
     }
 
+    private OneOfSchema parseOneOf(AbstractObject schema) {
+        if(!schema.hasArray("oneOf")){
+            throw new IllegalArgumentException("Not a valid oneOf schema");
+        }
+        AbstractArray absArr = schema.array("oneOf");
+        AbstractSchema[] schemas = new AbstractSchema[absArr.size()];
+        for(int i = 0; i<schemas.length;i++){
+            schemas[i] = parse(absArr.object(i));
+        }
+        return new OneOfSchema(schemas);
+    }
     private AbstractStringSchema parseString(AbstractObject schema) {
         if(!schema.string("type").equals("string"))
             throw new IllegalArgumentException("Not a valid string schema");
         AbstractStringSchema s = new AbstractStringSchema();
 
+        if(schema.has("minLength")){
+            s.minLength(schema.number("minLength").intValue());
+        }
+        if(schema.has("maxLength")){
+            s.maxLength(schema.number("maxLength").intValue());
+        }
+        if(schema.has("pattern")) {
+            s.regex(schema.string("pattern"));
+        }
+        if(schema.has("enum")){
+            s.enumValues(new HashSet<>(schema.array("enum").toStringList()));
+        }
+        if(schema.has("const")){
+            s.staticValue(schema.string("const"));
+        }
         return s;
     }
 
-    private AbstractNumberSchema parseInteger(AbstractObject schema) {
-        if(!schema.string("type").equals("integer"))
-            throw new IllegalArgumentException("Not a valid integer schema");
+    private AbstractNumberSchema parseNumber(AbstractObject schema) {
+        boolean isInteger = schema.string("type").equals("integer");
+
+        if (!isInteger && !schema.string("type").equals("number")) {
+            throw new IllegalArgumentException("Not a valid number schema");
+        }
         AbstractNumberSchema s = new AbstractNumberSchema();
+        if(isInteger){
+            s.integerOnly();
+        }
         if(schema.has("minimum"))
             s.min(schema.number("minimum"));
         if(schema.has("maximum"))
             s.max(schema.number("maximum"));
+        if(schema.has("exclusiveMinimum"))
+            s.min(schema.number("exclusiveMinimum"),true);
+        if(schema.has("exclusiveMaximum"))
+            s.max(schema.number("exclusiveMaximum"),true);
+        if(schema.has("const")){
+            Number staticValue = schema.number("const");
+            s.min(staticValue);
+            s.max(staticValue);
+        }
+        if(schema.has("multipleOf")){
+            s.step(schema.number("multipleOf"));
+        }
+
         return s;
     }
+
 
     private AbstractObjectSchema parseObject(AbstractObject schema) {
         if(!schema.string("type").equals("object"))
@@ -135,6 +152,20 @@ public class JsonSchemaParser {
                     s.optionalProperty(key, parse(propSchema.object()));
                 }
             });
+        }
+        AbstractElement additionalProperties = schema.get("additionalProperties");
+        if(additionalProperties != null){
+            if(additionalProperties.isBoolean()){
+                if(additionalProperties.bool()){
+                    s.additionalProperties();
+                }
+            } else {
+                s.additionalProperties(parse(additionalProperties.object()));
+            }
+
+
+        } else {
+            s.additionalProperties();
         }
         return s;
     }
@@ -152,7 +183,23 @@ public class JsonSchemaParser {
         if(schema.has("maxItems")) {
             s.max(schema.number("maxItems").intValue());
         }
+        if(schema.has("uniqueItems") && schema.bool("uniqueItems")){
+            s.unique();
+        }
         return s;
+    }
+
+    private AbstractBooleanSchema parseBoolean(AbstractObject schema){
+        if(!schema.string("type").equals("boolean"))
+            throw new IllegalArgumentException("Not a valid boolean schema");
+        AbstractBooleanSchema s = new AbstractBooleanSchema();
+        if(schema.has("const")){
+            s.staticValue(schema.bool("const"));
+        }
+
+
+        return new AbstractBooleanSchema();
+
     }
 
 }

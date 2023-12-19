@@ -22,6 +22,8 @@ public class SchemaValidationError {
         put("value_too_short", "The length of the value ({actual}) is shorter than the minimum of {min}");
         put("value_too_long", "The length of the value ({actual}) is longer than the maximum of {max}");
         put("invalid_pattern", "The value '{actual}' does not match the pattern '{pattern}'");
+        put("number_not_within_step", "The value '{start}' was not in steps of {step} starting from {start}");
+        put("duplicate_array_value", "The value '{value}' is a duplicate of '{first}'");
     }};
 
     private AbstractPath path;

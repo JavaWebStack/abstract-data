@@ -1,8 +1,6 @@
 package org.javawebstack.abstractdata.schema;
 
-import org.javawebstack.abstractdata.AbstractElement;
-import org.javawebstack.abstractdata.AbstractPath;
-import org.javawebstack.abstractdata.AbstractPrimitive;
+import org.javawebstack.abstractdata.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -71,6 +69,30 @@ public class AbstractStringSchema implements AbstractSchema {
 
     public List<CustomValidation<AbstractPrimitive>> getCustomValidations() {
         return customValidations;
+    }
+
+    @Override
+    public AbstractObject toJsonSchema() {
+        AbstractObject obj = new AbstractObject();
+        obj.set("type","string");
+        if(minLength != null){
+            obj.set("minLength",minLength);
+        }
+        if(maxLength != null){
+            obj.set("maxLength",maxLength);
+        }
+        if(staticValue != null) {
+            obj.set("const",staticValue);
+        }
+        if(regex != null) {
+            obj.set("pattern",regex);
+        }
+        if(enumValues != null) {
+            AbstractArray arr = new AbstractArray(enumValues.toArray());
+            obj.set("enum",arr);
+        }
+
+        return obj;
     }
 
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {

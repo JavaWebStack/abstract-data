@@ -7,6 +7,7 @@ import org.javawebstack.abstractdata.AbstractPath;
 import java.util.List;
 
 public interface AbstractSchema {
+    AbstractObject toJsonSchema();
 
     default List<SchemaValidationError> validate(AbstractElement value) {
         return validate(AbstractPath.ROOT, value);

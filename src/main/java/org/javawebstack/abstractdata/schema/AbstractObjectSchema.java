@@ -1,5 +1,6 @@
 package org.javawebstack.abstractdata.schema;
 
+import org.javawebstack.abstractdata.AbstractArray;
 import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.abstractdata.AbstractObject;
 import org.javawebstack.abstractdata.AbstractPath;
@@ -39,6 +40,30 @@ public class AbstractObjectSchema implements AbstractSchema {
         allowAdditionalProperties = true;
         additionalPropertySchema = schema;
         return this;
+    }
+
+    @Override
+    public AbstractObject toJsonSchema() {
+        AbstractObject obj = new AbstractObject();
+        obj.set("type","object");
+        AbstractObject properties = new AbstractObject();
+        this.properties.forEach((key, value)->{
+            properties.set(key,value.toJsonSchema());
+        });
+        obj.set("properties",properties);
+
+        if(!requiredProperties.isEmpty()){
+            AbstractArray required = new AbstractArray();
+            requiredProperties.forEach(required::add);
+            obj.set("required",required);
+        }
+        if(!allowAdditionalProperties){
+            obj.set("additionalProperties",false);
+        }else if(additionalPropertySchema != null){
+            obj.set("additionalProperties",additionalPropertySchema.toJsonSchema());
+        }
+
+        return obj;
     }
 
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {

@@ -1,6 +1,7 @@
 package org.javawebstack.abstractdata.schema;
 
 import org.javawebstack.abstractdata.AbstractElement;
+import org.javawebstack.abstractdata.AbstractObject;
 import org.javawebstack.abstractdata.AbstractPath;
 import org.javawebstack.abstractdata.AbstractPrimitive;
 
@@ -29,6 +30,16 @@ public class AbstractBooleanSchema implements AbstractSchema {
 
     public List<CustomValidation<AbstractPrimitive>> getCustomValidations() {
         return customValidations;
+    }
+
+    @Override
+    public AbstractObject toJsonSchema() {
+        AbstractObject obj = new AbstractObject()
+                .set("type","boolean");
+        if(staticValue != null){
+            obj.set("const",staticValue);
+        }
+        return obj;
     }
 
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {
