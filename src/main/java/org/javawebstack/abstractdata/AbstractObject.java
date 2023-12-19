@@ -71,7 +71,7 @@ public class AbstractObject implements AbstractElement {
     }
 
     public AbstractArray array(boolean strict) throws AbstractCoercingException {
-        if(strict)
+        if (strict)
             throw new AbstractCoercingException(Type.ARRAY, Type.OBJECT);
         AbstractArray array = new AbstractArray();
         for (int i = 0; i < size(); i++) {
@@ -94,17 +94,17 @@ public class AbstractObject implements AbstractElement {
     public AbstractElement query(String query) {
         String[] q = query.split("\\.", 2);
         AbstractElement e = get(q[0]);
-        if(e == null || q.length == 1)
+        if (e == null || q.length == 1)
             return e;
-        if(e.isObject())
+        if (e.isObject())
             return e.object().query(q[1]);
-        if(e.isArray())
+        if (e.isArray())
             return e.array().query(q[1]);
         return null;
     }
 
     public AbstractElement query(String query, AbstractElement orElse) {
-        if(orElse == null)
+        if (orElse == null)
             orElse = AbstractNull.VALUE;
         AbstractElement value = query(query);
         return (value != null && !value.isNull()) ? value : orElse;
@@ -288,7 +288,7 @@ public class AbstractObject implements AbstractElement {
         }
     }
 
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         return equals(obj, false);
     }
 }

@@ -11,19 +11,19 @@ public class AbstractPrimitive implements AbstractElement {
     private final Object value;
 
     public AbstractPrimitive(Number value) {
-        if(value == null)
+        if (value == null)
             throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
 
     public AbstractPrimitive(Boolean value) {
-        if(value == null)
+        if (value == null)
             throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
 
     public AbstractPrimitive(String value) {
-        if(value == null)
+        if (value == null)
             throw new NullPointerException("AbstractPrimitive value can not be null");
         this.value = value;
     }
@@ -53,8 +53,8 @@ public class AbstractPrimitive implements AbstractElement {
     }
 
     public String string(boolean strict) throws AbstractCoercingException {
-        if(!(value instanceof String)) {
-            if(strict)
+        if (!(value instanceof String)) {
+            if (strict)
                 throw new AbstractCoercingException(Type.STRING, getType());
             switch (getType()) {
                 case BOOLEAN:
@@ -73,8 +73,8 @@ public class AbstractPrimitive implements AbstractElement {
     }
 
     public Number number(boolean strict) throws AbstractCoercingException {
-        if(!(value instanceof Number)) {
-            if(strict)
+        if (!(value instanceof Number)) {
+            if (strict)
                 throw new AbstractCoercingException(Type.NUMBER, getType());
             switch (getType()) {
                 case BOOLEAN:
@@ -98,8 +98,8 @@ public class AbstractPrimitive implements AbstractElement {
     }
 
     public Boolean bool(boolean strict) throws AbstractCoercingException {
-        if(!(value instanceof Boolean)) {
-            if(strict)
+        if (!(value instanceof Boolean)) {
+            if (strict)
                 throw new AbstractCoercingException(Type.BOOLEAN, getType());
             switch (getType()) {
                 case STRING: {
@@ -120,9 +120,9 @@ public class AbstractPrimitive implements AbstractElement {
                 }
                 case NUMBER: {
                     long l = ((Number) value).longValue();
-                    if(l == 0)
+                    if (l == 0)
                         return false;
-                    if(l == 1)
+                    if (l == 1)
                         return true;
                     throw new AbstractCoercingException(Type.BOOLEAN, this);
                 }
@@ -182,17 +182,18 @@ public class AbstractPrimitive implements AbstractElement {
             return false;
         AbstractPrimitive primitive = (AbstractPrimitive) obj;
         try {
-            if(isBoolean())
+            if (isBoolean())
                 return bool() == primitive.bool(strict);
-            if(isNumber())
+            if (isNumber())
                 return number().equals(primitive.number(strict));
-            if(isString())
+            if (isString())
                 return string().equals(primitive.string(strict));
-        } catch (AbstractCoercingException ignored) {}
+        } catch (AbstractCoercingException ignored) {
+        }
         return false;
     }
 
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         return equals(obj, false);
     }
 }

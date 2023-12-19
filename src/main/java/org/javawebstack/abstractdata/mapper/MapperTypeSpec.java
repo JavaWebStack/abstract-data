@@ -15,19 +15,19 @@ public class MapperTypeSpec {
     private static final Map<Class<?>, MapperTypeSpec> typeSpecs = new HashMap<>();
 
     public static MapperTypeSpec get(Class<?> type) throws MapperException {
-        if(type.isArray() || type.isEnum() || type.isPrimitive())
+        if (type.isArray() || type.isEnum() || type.isPrimitive())
             return null;
-        if(Integer.class.equals(type))
+        if (Integer.class.equals(type))
             return null;
-        if(Long.class.equals(type))
+        if (Long.class.equals(type))
             return null;
-        if(Double.class.equals(type))
+        if (Double.class.equals(type))
             return null;
-        if(Float.class.equals(type))
+        if (Float.class.equals(type))
             return null;
-        if(Short.class.equals(type))
+        if (Short.class.equals(type))
             return null;
-        if(Boolean.class.equals(type))
+        if (Boolean.class.equals(type))
             return null;
         return typeSpecs.computeIfAbsent(type, MapperTypeSpec::new);
     }
@@ -49,8 +49,8 @@ public class MapperTypeSpec {
             current = current.getSuperclass();
         } while (!Object.class.equals(current)); // Collect parent classes recursively
         while (!classes.empty()) {
-            for(Field f : classes.pop().getDeclaredFields()) {
-                if(Modifier.isStatic(f.getModifiers())) // Don't include static fields
+            for (Field f : classes.pop().getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers())) // Don't include static fields
                     continue;
                 checkoutField(f);
             }
@@ -60,11 +60,11 @@ public class MapperTypeSpec {
 
     private void checkoutField(Field field) throws MapperException {
         Map<Class<? extends Annotation>, List<Annotation>> annotations = new HashMap<>();
-        for(Annotation annotation : field.getDeclaredAnnotations())
+        for (Annotation annotation : field.getDeclaredAnnotations())
             annotations.computeIfAbsent(annotation.annotationType(), k -> new ArrayList<>()).add(annotation);
 
-        if(annotations.containsKey(Additional.class)) {
-            if(!field.getType().equals(AbstractObject.class))
+        if (annotations.containsKey(Additional.class)) {
+            if (!field.getType().equals(AbstractObject.class))
                 throw new MapperException("Additional field '" + field.getName() + "' in type '" + field.getDeclaringClass().getName() + "' needs to be of type AbstractObject, found '" + field.getType().getName() + "'");
             additionalField = field;
             return;
@@ -76,11 +76,11 @@ public class MapperTypeSpec {
         spec.field = field;
         spec.annotations = annotations;
 
-        if(annotations.containsKey(MapperOptions.class)) {
+        if (annotations.containsKey(MapperOptions.class)) {
             MapperOptions options = (MapperOptions) annotations.get(MapperOptions.class).get(0);
-            if(options.name().length() > 0)
+            if (options.name().length() > 0)
                 spec.name = options.name();
-            if(!options.adapter().equals(MapperTypeAdapter.class)) {
+            if (!options.adapter().equals(MapperTypeAdapter.class)) {
                 try {
                     spec.adapter = options.adapter().newInstance();
                 } catch (InstantiationException | IllegalAccessException e) {
@@ -104,7 +104,7 @@ public class MapperTypeSpec {
     }
 
     public Field getAdditionalField() {
-        if(additionalField != null)
+        if (additionalField != null)
             additionalField.setAccessible(true);
         return additionalField;
     }

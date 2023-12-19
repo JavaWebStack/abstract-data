@@ -12,11 +12,17 @@ import java.lang.annotation.Target;
 public @interface MapperOptions {
 
     String name() default "";
+
     int order() default 0;
+
     Class<?>[] generic() default {};
+
     boolean expose() default false;
+
     boolean hidden() default false;
+
     boolean omitNull() default true;
+
     Class<? extends MapperTypeAdapter> adapter() default MapperTypeAdapter.class;
 
 }

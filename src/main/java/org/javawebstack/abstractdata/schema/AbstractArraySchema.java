@@ -2,6 +2,7 @@ package org.javawebstack.abstractdata.schema;
 
 import org.javawebstack.abstractdata.AbstractArray;
 import org.javawebstack.abstractdata.AbstractElement;
+import org.javawebstack.abstractdata.AbstractObject;
 import org.javawebstack.abstractdata.AbstractPath;
 
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ public class AbstractArraySchema implements AbstractSchema {
     private Integer min;
     private Integer max;
     private boolean allowNull = false;
+
+    private boolean unique;
     private final List<CustomValidation<AbstractArray>> customValidations = new ArrayList<>();
 
     public AbstractArraySchema itemSchema(AbstractSchema schema) {
@@ -33,6 +36,11 @@ public class AbstractArraySchema implements AbstractSchema {
 
     public AbstractArraySchema allowNull() {
         this.allowNull = true;
+        return this;
+    }
+
+    public AbstractArraySchema unique() {
+        this.unique = true;
         return this;
     }
 
@@ -57,33 +65,67 @@ public class AbstractArraySchema implements AbstractSchema {
         return customValidations;
     }
 
+    @Override
+    public AbstractObject toJsonSchema() {
+        AbstractObject obj = new AbstractObject();
+        obj.set("type", "array");
+        if (min != null) {
+            obj.set("minItems", min);
+        }
+        if (max != null) {
+            obj.set("maxItems", max);
+        }
+        if (itemSchema != null) {
+            obj.set("items", itemSchema.toJsonSchema());
+        }
+        if (unique) {
+            obj.set("uniqueItems", "true");
+        }
+        return obj;
+    }
+
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {
         List<SchemaValidationError> errors = new ArrayList<>();
-        if(value.getType() != AbstractElement.Type.ARRAY) {
+        if (value.getType() != AbstractElement.Type.ARRAY) {
             errors.add(new SchemaValidationError(path, "invalid_type").meta("expected", "array").meta("actual", value.getType().name().toLowerCase(Locale.ROOT)));
             return errors;
         }
         AbstractArray array = value.array();
-        if(min != null && array.size() < min) {
+        if (min != null && array.size() < min) {
             errors.add(new SchemaValidationError(path, "not_enough_items").meta("min", String.valueOf(min)).meta("actual", String.valueOf(array.size())));
         }
-        if(max != null && array.size() > max) {
+        if (max != null && array.size() > max) {
             errors.add(new SchemaValidationError(path, "too_many_items").meta("max", String.valueOf(max)).meta("actual", String.valueOf(array.size())));
         }
-        if(itemSchema != null) {
-            for(int i=0; i<array.size(); i++) {
-                AbstractElement item = array.get(i);
-                AbstractPath itemPath = path.subPath(String.valueOf(i));
-                if(item.isNull()) {
-                    if(!allowNull) {
+        List<AbstractElement> seen = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            AbstractElement item = array.get(i);
+            AbstractPath itemPath = path.subPath(String.valueOf(i));
+            if (itemSchema != null) {
+                if (item.isNull()) {
+                    if (!allowNull) {
                         errors.add(new SchemaValidationError(itemPath, "null_not_allowed"));
                     }
                     continue;
                 }
                 errors.addAll(itemSchema.validate(itemPath, array.get(i)));
             }
+
+            if (unique) {
+                if (seen.contains(item)) {
+                    int originalIndex = seen.indexOf(item);
+                    AbstractPath originalPath = path.subPath(String.valueOf(originalIndex));
+                    errors.add(new SchemaValidationError(itemPath, "duplicate_array_value")
+                            .meta("value", item.toJsonString())
+                            .meta("first", originalPath.toString()));
+                }
+                seen.add(item);
+            }
+
         }
-        for(CustomValidation<AbstractArray> validation : customValidations) {
+
+
+        for (CustomValidation<AbstractArray> validation : customValidations) {
             errors.addAll(validation.validate(path, array));
         }
         return errors;

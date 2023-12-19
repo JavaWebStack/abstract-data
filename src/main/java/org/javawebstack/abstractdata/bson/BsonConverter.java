@@ -97,72 +97,73 @@ public class BsonConverter {
     }
 
     public BsonValue toBson(AbstractElement element) {
-        if(element == null || element.isNull())
+        if (element == null || element.isNull())
             return BsonNull.VALUE;
-        if(element.isString())
+        if (element.isString())
             return new BsonString(element.string());
-        if(element.isBoolean())
+        if (element.isBoolean())
             return new BsonBoolean(element.bool());
-        if(element.isNumber()) {
+        if (element.isNumber()) {
             Number n = element.number();
-            if(n instanceof Integer || n instanceof Short || n instanceof Byte) {
+            if (n instanceof Integer || n instanceof Short || n instanceof Byte) {
                 return new BsonInt32(n.intValue());
-            } else if(n instanceof Long) {
+            } else if (n instanceof Long) {
                 return new BsonInt64(n.longValue());
-            } else if(n instanceof Float || n instanceof Double) {
+            } else if (n instanceof Float || n instanceof Double) {
                 return new BsonDouble(n.doubleValue());
             }
         }
-        if(element.isArray()) {
+        if (element.isArray()) {
             BsonArray a = new BsonArray();
-            for(AbstractElement e : element.array())
+            for (AbstractElement e : element.array())
                 a.add(toBson(e));
             return a;
         }
         AbstractObject o = element.object();
-        if(o.size() == 1 && o.has("$oid") && o.get("$oid").isString())
+        if (o.size() == 1 && o.has("$oid") && o.get("$oid").isString())
             return new BsonObjectId(new ObjectId(o.string("$oid")));
-        if(o.size() == 1 && o.has("$undefined") && o.get("$undefined").isBoolean())
+        if (o.size() == 1 && o.has("$undefined") && o.get("$undefined").isBoolean())
             return new BsonUndefined();
-        if(o.size() == 1 && o.has("$date") && o.get("$date").isString()) {
+        if (o.size() == 1 && o.has("$date") && o.get("$date").isString()) {
             try {
                 return new BsonDateTime(dateFormat.parse(o.string("$date")).getTime());
-            } catch (ParseException ignored) {}
+            } catch (ParseException ignored) {
+            }
         }
-        if(o.size() == 1 && o.has("$numberDecimal") && o.get("$numberDecimal").isString())
+        if (o.size() == 1 && o.has("$numberDecimal") && o.get("$numberDecimal").isString())
             return new BsonDecimal128(Decimal128.parse(o.string("$numberDecimal")));
-        if(o.size() == 1 && o.has("$minKey") && o.get("$minKey").isNumber())
+        if (o.size() == 1 && o.has("$minKey") && o.get("$minKey").isNumber())
             return new BsonMinKey();
-        if(o.size() == 1 && o.has("$maxKey") && o.get("$maxKey").isNumber())
+        if (o.size() == 1 && o.has("$maxKey") && o.get("$maxKey").isNumber())
             return new BsonMinKey();
-        if(o.size() == 1 && o.has("$symbol") && o.get("$symbol").isString())
+        if (o.size() == 1 && o.has("$symbol") && o.get("$symbol").isString())
             return new BsonSymbol(o.string("$symbol"));
-        if(o.size() == 1 && o.has("$code") && o.get("$code").isString())
+        if (o.size() == 1 && o.has("$code") && o.get("$code").isString())
             return new BsonJavaScript(o.string("$code"));
-        if(o.size() == 2 && o.has("$code") && o.has("$scope") && o.get("$code").isString() && o.get("$scope").isObject())
+        if (o.size() == 2 && o.has("$code") && o.has("$scope") && o.get("$code").isString() && o.get("$scope").isObject())
             return new BsonJavaScriptWithScope(o.string("$code"), toBson(o.get("$scope")).asDocument());
-        if(o.size() == 1 && o.has("$timestamp") && o.get("$timestamp").isObject()) {
+        if (o.size() == 1 && o.has("$timestamp") && o.get("$timestamp").isObject()) {
             AbstractObject ts = o.object("$timestamp");
-            if(ts.has("t") && ts.has("i") && ts.get("t").isNumber() && ts.get("i").isNumber()) {
+            if (ts.has("t") && ts.has("i") && ts.get("t").isNumber() && ts.get("i").isNumber()) {
                 return new BsonTimestamp((int) ts.number("t").longValue(), (int) ts.number("i").longValue());
             }
         }
-        if(o.size() == 1 && o.has("$regularExpression") && o.get("$regularExpression").isObject()) {
+        if (o.size() == 1 && o.has("$regularExpression") && o.get("$regularExpression").isObject()) {
             AbstractObject re = o.object("$regularExpression");
-            if(re.has("pattern") && re.has("options") && re.get("pattern").isString() && (re.get("options").isString() || re.get("options").isNull())) {
+            if (re.has("pattern") && re.has("options") && re.get("pattern").isString() && (re.get("options").isString() || re.get("options").isNull())) {
                 return new BsonRegularExpression(re.string("pattern"), (String) re.toObject());
             }
         }
-        if(o.size() == 1 && o.has("$binary") && o.get("$binary").isObject()) {
+        if (o.size() == 1 && o.has("$binary") && o.get("$binary").isObject()) {
             AbstractObject bin = o.object("$binary");
-            if(bin.has("base64") && bin.has("subType") && bin.get("base64").isString() && bin.get("subType").isString()) {
+            if (bin.has("base64") && bin.has("subType") && bin.get("base64").isString() && bin.get("subType").isString()) {
                 byte[] data = Base64.getDecoder().decode(bin.string("base64"));
                 byte type = (byte) Integer.parseInt(bin.string("subType"), 16);
                 return new BsonBinary(type, data);
             }
         }
         BsonDocument doc = new BsonDocument(o.size());
-        for(String k : o.keys())
+        for (String k : o.keys())
             doc.put(k, toBson(o.get(k)));
         return doc;
     }

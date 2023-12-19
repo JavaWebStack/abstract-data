@@ -14,14 +14,14 @@ public class XMLElement implements XMLNode {
     private final List<XMLNode> childNodes = new ArrayList<>();
 
     public XMLElement(String tagName) {
-        if(tagName == null)
+        if (tagName == null)
             throw new IllegalArgumentException("tagName can not be null");
         this.tagName = tagName;
     }
 
     public XMLElement(String tagName, String text) {
         this(tagName);
-        if(text == null)
+        if (text == null)
             throw new IllegalArgumentException("text can not be null");
         text(text);
     }
@@ -54,7 +54,7 @@ public class XMLElement implements XMLNode {
     }
 
     public XMLElement attr(String name, String value) {
-        if(value == null) {
+        if (value == null) {
             attributes.remove(name);
             return this;
         }
@@ -78,7 +78,7 @@ public class XMLElement implements XMLNode {
     }
 
     public XMLElement onlyIf(boolean condition, Consumer<XMLElement> fn) {
-        if(condition)
+        if (condition)
             fn.accept(this);
         return this;
     }

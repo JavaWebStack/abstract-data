@@ -13,7 +13,7 @@ public class AbstractPath {
 
     public AbstractPath(String name) {
         this(ROOT, name);
-        if(name == null || name.isEmpty())
+        if (name == null || name.isEmpty())
             throw new IllegalArgumentException("Name can not be null or empty");
     }
 
@@ -43,14 +43,14 @@ public class AbstractPath {
 
     public AbstractPath concat(AbstractPath path) {
         AbstractPath cloned = clone();
-        for(String part : path.getParts())
+        for (String part : path.getParts())
             cloned = cloned.subPath(part);
         return cloned;
     }
 
     public List<String> getParts() {
         List<String> parts = parent != null ? parent.getParts() : new ArrayList<>();
-        if(name != null)
+        if (name != null)
             parts.add(name);
         return parts;
     }
@@ -61,13 +61,13 @@ public class AbstractPath {
 
     public static AbstractPath parse(String s) {
         s = s.trim();
-        if(s.isEmpty())
+        if (s.isEmpty())
             return ROOT;
         String[] spl = s.split("\\.");
         AbstractPath path = new AbstractPath(spl[0]);
-        for(int i=1; i<spl.length; i++) {
+        for (int i = 1; i < spl.length; i++) {
             String sub = spl[i];
-            if(sub.isEmpty())
+            if (sub.isEmpty())
                 throw new IllegalArgumentException("Invalid empty sub-path");
             path = path.subPath(spl[i]);
         }
@@ -75,17 +75,17 @@ public class AbstractPath {
     }
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof AbstractPath))
+        if (!(obj instanceof AbstractPath))
             return false;
         AbstractPath other = (AbstractPath) obj;
-        if(parent != null) {
-            if(!parent.equals(other.parent))
+        if (parent != null) {
+            if (!parent.equals(other.parent))
                 return false;
         } else {
-            if(other.parent != null)
+            if (other.parent != null)
                 return false;
         }
-        if(name == null)
+        if (name == null)
             return other.name == null;
         return name.equals(other.name);
     }

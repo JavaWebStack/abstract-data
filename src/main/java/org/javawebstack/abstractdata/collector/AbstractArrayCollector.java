@@ -30,7 +30,10 @@ public class AbstractArrayCollector<T> implements Collector<T, List<AbstractElem
     }
 
     public BinaryOperator<List<AbstractElement>> combiner() {
-        return (l1, l2) -> { l1.addAll(l2); return l1; };
+        return (l1, l2) -> {
+            l1.addAll(l2);
+            return l1;
+        };
     }
 
     public Function<List<AbstractElement>, AbstractArray> finisher() {

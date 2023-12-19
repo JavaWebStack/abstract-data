@@ -47,13 +47,13 @@ public class MapperContext {
     }
 
     public <T extends Annotation> List<T> getAnnotations(Class<T> type) {
-        if(!annotations.containsKey(type))
+        if (!annotations.containsKey(type))
             return new ArrayList<>();
         return (List<T>) annotations.get(type);
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> type) {
-        if(!annotations.containsKey(type))
+        if (!annotations.containsKey(type))
             return null;
         return (T) annotations.get(type).get(0);
     }

@@ -28,36 +28,36 @@ public class BsonTypeAdapter implements MapperTypeAdapter {
     }
 
     public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
-        if(value instanceof byte[]) {
+        if (value instanceof byte[]) {
             ByteBuffer buffer = ByteBuffer.wrap((byte[]) value);
             buffer.order(ByteOrder.LITTLE_ENDIAN);
             return converter.toAbstract(new BsonDocumentCodec().decode(new BsonBinaryReader(buffer), DecoderContext.builder().build()));
         }
-        if(value instanceof ObjectId)
+        if (value instanceof ObjectId)
             return converter.toAbstract((ObjectId) value);
-        if(value instanceof Decimal128)
+        if (value instanceof Decimal128)
             return converter.toAbstract((Decimal128) value);
         return converter.toAbstract((BsonValue) value);
     }
 
     public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
         BsonValue value = converter.toBson(element);
-        if(value instanceof BsonNull && !BsonNull.class.equals(type))
+        if (value instanceof BsonNull && !BsonNull.class.equals(type))
             return null;
-        if(byte[].class.equals(type)) {
+        if (byte[].class.equals(type)) {
             BasicOutputBuffer outputBuffer = new BasicOutputBuffer();
             new BsonDocumentCodec().encode(new BsonBinaryWriter(outputBuffer), value.asDocument(), EncoderContext.builder().build());
             return outputBuffer.toByteArray();
         }
-        if(ObjectId.class.equals(type))
+        if (ObjectId.class.equals(type))
             return value.asObjectId().getValue();
-        if(Decimal128.class.equals(type))
+        if (Decimal128.class.equals(type))
             return value.asDecimal128().getValue();
         return value;
     }
 
     public Class<?>[] getSupportedTypes() {
-        return new Class[] {
+        return new Class[]{
                 ObjectId.class,
                 Decimal128.class,
                 BsonValue.class,

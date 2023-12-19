@@ -1,11 +1,13 @@
 package org.javawebstack.abstractdata.schema;
 
 import org.javawebstack.abstractdata.AbstractElement;
+import org.javawebstack.abstractdata.AbstractObject;
 import org.javawebstack.abstractdata.AbstractPath;
 
 import java.util.List;
 
 public interface AbstractSchema {
+    AbstractObject toJsonSchema();
 
     default List<SchemaValidationError> validate(AbstractElement value) {
         return validate(AbstractPath.ROOT, value);
@@ -67,6 +69,10 @@ public interface AbstractSchema {
 
     static OneOfSchema oneOf(AbstractSchema... schemas) {
         return new OneOfSchema(schemas);
+    }
+
+    static AbstractSchema fromJsonSchema(AbstractObject schema) {
+        return new JsonSchemaParser().parse(schema);
     }
 
 }

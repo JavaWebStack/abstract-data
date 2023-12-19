@@ -22,6 +22,8 @@ public class SchemaValidationError {
         put("value_too_short", "The length of the value ({actual}) is shorter than the minimum of {min}");
         put("value_too_long", "The length of the value ({actual}) is longer than the maximum of {max}");
         put("invalid_pattern", "The value '{actual}' does not match the pattern '{pattern}'");
+        put("number_not_within_step", "The value '{start}' was not in steps of {step} starting from {start}");
+        put("duplicate_array_value", "The value '{value}' is a duplicate of '{first}'");
     }};
 
     private AbstractPath path;
@@ -56,14 +58,14 @@ public class SchemaValidationError {
 
     public String getErrorDescription(Map<String, String> customDescriptions) {
         String message;
-        if(customDescriptions.containsKey(error)) {
+        if (customDescriptions.containsKey(error)) {
             message = customDescriptions.get(error);
-        } else if(BUILTIN_DESCRIPTIONS.containsKey(error)) {
+        } else if (BUILTIN_DESCRIPTIONS.containsKey(error)) {
             message = BUILTIN_DESCRIPTIONS.get(error);
         } else {
             return error;
         }
-        for(String key : errorMeta.keySet()) {
+        for (String key : errorMeta.keySet()) {
             message = message.replace("{" + key + "}", errorMeta.get(key));
         }
         return message;
@@ -71,7 +73,7 @@ public class SchemaValidationError {
 
     public static Map<AbstractPath, List<SchemaValidationError>> groupErrors(List<SchemaValidationError> errors) {
         Map<AbstractPath, List<SchemaValidationError>> errorMap = new HashMap<>();
-        for(SchemaValidationError e : errors) {
+        for (SchemaValidationError e : errors) {
             errorMap.computeIfAbsent(e.getPath(), k -> new ArrayList<>()).add(e);
         }
         return errorMap;

@@ -32,7 +32,10 @@ public class AbstractObjectCollector<T> implements Collector<T, Map<String, Abst
     }
 
     public BinaryOperator<Map<String, AbstractElement>> combiner() {
-        return (m1, m2) -> { m1.putAll(m2); return m1; };
+        return (m1, m2) -> {
+            m1.putAll(m2);
+            return m1;
+        };
     }
 
     public Function<Map<String, AbstractElement>, AbstractObject> finisher() {

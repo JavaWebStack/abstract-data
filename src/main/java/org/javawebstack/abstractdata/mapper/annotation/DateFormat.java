@@ -10,8 +10,11 @@ import java.lang.annotation.Target;
 public @interface DateFormat {
 
     String value() default "";
+
     String timezone() default "";
+
     boolean epoch() default false;
+
     boolean millis() default false;
 
 }
