@@ -29,27 +29,27 @@ public class Mapper {
     }
 
     public <T> T map(MapperContext context, AbstractElement element, Class<T> type) throws MapperException {
-        if(type == null || element == null || element.isNull())
+        if (type == null || element == null || element.isNull())
             return null;
-        if(type.isArray()) {
-            if(!element.isArray())
+        if (type.isArray()) {
+            if (!element.isArray())
                 throw new MapperWrongTypeException(null, "array", Helpers.typeName(element));
             Object arr = Array.newInstance(type.getComponentType(), element.array().size());
-            for(int i=0; i<element.array().size(); i++)
+            for (int i = 0; i < element.array().size(); i++)
                 Array.set(arr, i, map(emptyContext, element.array().get(i), type.getComponentType()));
             return (T) arr;
         }
-        if(context.getAdapter() != null)
+        if (context.getAdapter() != null)
             return (T) context.getAdapter().fromAbstract(context, element, type);
         return (T) findAdapter(type).fromAbstract(context, element, type);
     }
 
     private MapperTypeAdapter findAdapter(Class<?> type) {
         MapperTypeAdapter adapter = adapters.get(type);
-        if(adapter != null)
+        if (adapter != null)
             return adapter;
-        for(Class<?> t : adapters.keySet()) {
-            if(t.isAssignableFrom(type)) {
+        for (Class<?> t : adapters.keySet()) {
+            if (t.isAssignableFrom(type)) {
                 return adapters.get(t);
             }
         }
@@ -61,15 +61,15 @@ public class Mapper {
     }
 
     public AbstractElement map(MapperContext context, Object obj) throws MapperException {
-        if(obj == null)
+        if (obj == null)
             return AbstractNull.VALUE;
-        if(obj.getClass().isArray()) {
+        if (obj.getClass().isArray()) {
             AbstractArray array = new AbstractArray();
-            for(int i=0; i<Array.getLength(obj); i++)
+            for (int i = 0; i < Array.getLength(obj); i++)
                 array.add(map(Array.get(obj, i)));
             return array;
         }
-        if(context.getAdapter() != null)
+        if (context.getAdapter() != null)
             return context.getAdapter().toAbstract(context, obj);
         return findAdapter(obj.getClass()).toAbstract(context, obj);
     }
@@ -134,8 +134,8 @@ public class Mapper {
 
     public Mapper adapter(MapperTypeAdapter adapter) {
         Class<?>[] types = adapter.getSupportedTypes();
-        if(types != null) {
-            for(Class<?> type : types)
+        if (types != null) {
+            for (Class<?> type : types)
                 adapter(type, adapter);
         }
         return this;

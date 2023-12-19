@@ -23,7 +23,7 @@ public class AbstractStringSchema implements AbstractSchema {
 
     public AbstractStringSchema enumValues(Class<? extends Enum<?>> enumType) {
         Set<String> values = new HashSet<>();
-        for(Enum<?> v : enumType.getEnumConstants()) {
+        for (Enum<?> v : enumType.getEnumConstants()) {
             values.add(v.name());
         }
         return enumValues(values);
@@ -74,22 +74,22 @@ public class AbstractStringSchema implements AbstractSchema {
     @Override
     public AbstractObject toJsonSchema() {
         AbstractObject obj = new AbstractObject();
-        obj.set("type","string");
-        if(minLength != null){
-            obj.set("minLength",minLength);
+        obj.set("type", "string");
+        if (minLength != null) {
+            obj.set("minLength", minLength);
         }
-        if(maxLength != null){
-            obj.set("maxLength",maxLength);
+        if (maxLength != null) {
+            obj.set("maxLength", maxLength);
         }
-        if(staticValue != null) {
-            obj.set("const",staticValue);
+        if (staticValue != null) {
+            obj.set("const", staticValue);
         }
-        if(regex != null) {
-            obj.set("pattern",regex);
+        if (regex != null) {
+            obj.set("pattern", regex);
         }
-        if(enumValues != null) {
+        if (enumValues != null) {
             AbstractArray arr = new AbstractArray(enumValues.toArray());
-            obj.set("enum",arr);
+            obj.set("enum", arr);
         }
 
         return obj;
@@ -97,30 +97,30 @@ public class AbstractStringSchema implements AbstractSchema {
 
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {
         List<SchemaValidationError> errors = new ArrayList<>();
-        if(value.getType() != AbstractElement.Type.STRING) {
+        if (value.getType() != AbstractElement.Type.STRING) {
             errors.add(new SchemaValidationError(path, "invalid_type").meta("expected", "string").meta("actual", value.getType().name().toLowerCase(Locale.ROOT)));
             return errors;
         }
         String s = value.string();
-        if(staticValue != null && !staticValue.equals(s)) {
+        if (staticValue != null && !staticValue.equals(s)) {
             errors.add(new SchemaValidationError(path, "invalid_static_value").meta("expected", staticValue).meta("actual", s));
         }
-        if(enumValues != null && !enumValues.contains(s)) {
+        if (enumValues != null && !enumValues.contains(s)) {
             errors.add(new SchemaValidationError(path, "invalid_enum_value").meta("expected", String.join(", ", enumValues)).meta("actual", s));
         }
-        if(minLength != null && s.length() < minLength) {
+        if (minLength != null && s.length() < minLength) {
             errors.add(new SchemaValidationError(path, "value_too_short").meta("min", minLength.toString()).meta("actual", String.valueOf(s.length())));
         }
-        if(maxLength != null && s.length() > maxLength) {
+        if (maxLength != null && s.length() > maxLength) {
             errors.add(new SchemaValidationError(path, "value_too_long").meta("max", maxLength.toString()).meta("actual", String.valueOf(s.length())));
         }
-        if(regexPattern != null) {
+        if (regexPattern != null) {
             Matcher matcher = regexPattern.matcher(s);
-            if(!matcher.matches()) {
+            if (!matcher.matches()) {
                 errors.add(new SchemaValidationError(path, "invalid_pattern").meta("pattern", regex).meta("actual", s));
             }
         }
-        for(CustomValidation<AbstractPrimitive> validation : customValidations) {
+        for (CustomValidation<AbstractPrimitive> validation : customValidations) {
             errors.addAll(validation.validate(path, value.primitive()));
         }
         return errors;

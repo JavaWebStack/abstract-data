@@ -1,7 +1,7 @@
 package org.javawebstack.abstractdata;
 
 public enum NamingPolicy {
-    
+
     NONE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.NONE),
     CAMEL_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.CAMEL_CASE),
     PASCAL_CASE(org.javawebstack.abstractdata.mapper.naming.NamingPolicy.PASCAL_CASE),

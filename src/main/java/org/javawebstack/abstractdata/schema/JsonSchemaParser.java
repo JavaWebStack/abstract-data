@@ -4,7 +4,9 @@ import org.javawebstack.abstractdata.AbstractArray;
 import org.javawebstack.abstractdata.AbstractElement;
 import org.javawebstack.abstractdata.AbstractObject;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /*
 {
@@ -42,7 +44,7 @@ public class JsonSchemaParser {
     }
 
     public AbstractSchema parse(AbstractObject schema) {
-        if(schema.has("type")) {
+        if (schema.has("type")) {
             switch (schema.string("type")) {
                 case "object": {
                     return parseObject(schema);
@@ -65,44 +67,45 @@ public class JsonSchemaParser {
                 }
             }
         }
-        if(schema.has("$ref")) {
+        if (schema.has("$ref")) {
             throw new UnsupportedOperationException("$ref is currently not supported");
         }
-        if(schema.has("oneOf")){
+        if (schema.has("oneOf")) {
             return parseOneOf(schema);
         }
         throw new IllegalArgumentException("Invalid json schema");
     }
 
     private OneOfSchema parseOneOf(AbstractObject schema) {
-        if(!schema.hasArray("oneOf")){
+        if (!schema.hasArray("oneOf")) {
             throw new IllegalArgumentException("Not a valid oneOf schema");
         }
         AbstractArray absArr = schema.array("oneOf");
         AbstractSchema[] schemas = new AbstractSchema[absArr.size()];
-        for(int i = 0; i<schemas.length;i++){
+        for (int i = 0; i < schemas.length; i++) {
             schemas[i] = parse(absArr.object(i));
         }
         return new OneOfSchema(schemas);
     }
+
     private AbstractStringSchema parseString(AbstractObject schema) {
-        if(!schema.string("type").equals("string"))
+        if (!schema.string("type").equals("string"))
             throw new IllegalArgumentException("Not a valid string schema");
         AbstractStringSchema s = new AbstractStringSchema();
 
-        if(schema.has("minLength")){
+        if (schema.has("minLength")) {
             s.minLength(schema.number("minLength").intValue());
         }
-        if(schema.has("maxLength")){
+        if (schema.has("maxLength")) {
             s.maxLength(schema.number("maxLength").intValue());
         }
-        if(schema.has("pattern")) {
+        if (schema.has("pattern")) {
             s.regex(schema.string("pattern"));
         }
-        if(schema.has("enum")){
+        if (schema.has("enum")) {
             s.enumValues(new HashSet<>(schema.array("enum").toStringList()));
         }
-        if(schema.has("const")){
+        if (schema.has("const")) {
             s.staticValue(schema.string("const"));
         }
         return s;
@@ -115,23 +118,23 @@ public class JsonSchemaParser {
             throw new IllegalArgumentException("Not a valid number schema");
         }
         AbstractNumberSchema s = new AbstractNumberSchema();
-        if(isInteger){
+        if (isInteger) {
             s.integerOnly();
         }
-        if(schema.has("minimum"))
+        if (schema.has("minimum"))
             s.min(schema.number("minimum"));
-        if(schema.has("maximum"))
+        if (schema.has("maximum"))
             s.max(schema.number("maximum"));
-        if(schema.has("exclusiveMinimum"))
-            s.min(schema.number("exclusiveMinimum"),true);
-        if(schema.has("exclusiveMaximum"))
-            s.max(schema.number("exclusiveMaximum"),true);
-        if(schema.has("const")){
+        if (schema.has("exclusiveMinimum"))
+            s.min(schema.number("exclusiveMinimum"), true);
+        if (schema.has("exclusiveMaximum"))
+            s.max(schema.number("exclusiveMaximum"), true);
+        if (schema.has("const")) {
             Number staticValue = schema.number("const");
             s.min(staticValue);
             s.max(staticValue);
         }
-        if(schema.has("multipleOf")){
+        if (schema.has("multipleOf")) {
             s.step(schema.number("multipleOf"));
         }
 
@@ -140,13 +143,13 @@ public class JsonSchemaParser {
 
 
     private AbstractObjectSchema parseObject(AbstractObject schema) {
-        if(!schema.string("type").equals("object"))
+        if (!schema.string("type").equals("object"))
             throw new IllegalArgumentException("Not a valid object schema");
         AbstractObjectSchema s = new AbstractObjectSchema();
         List<String> required = schema.has("required") ? schema.array("required").toStringList() : Collections.emptyList();
-        if(schema.has("properties")) {
+        if (schema.has("properties")) {
             schema.object("properties").forEach((key, propSchema) -> {
-                if(required.contains(key)) {
+                if (required.contains(key)) {
                     s.requiredProperty(key, parse(propSchema.object()));
                 } else {
                     s.optionalProperty(key, parse(propSchema.object()));
@@ -154,9 +157,9 @@ public class JsonSchemaParser {
             });
         }
         AbstractElement additionalProperties = schema.get("additionalProperties");
-        if(additionalProperties != null){
-            if(additionalProperties.isBoolean()){
-                if(additionalProperties.bool()){
+        if (additionalProperties != null) {
+            if (additionalProperties.isBoolean()) {
+                if (additionalProperties.bool()) {
                     s.additionalProperties();
                 }
             } else {
@@ -171,29 +174,29 @@ public class JsonSchemaParser {
     }
 
     private AbstractArraySchema parseArray(AbstractObject schema) {
-        if(!schema.string("type").equals("array"))
+        if (!schema.string("type").equals("array"))
             throw new IllegalArgumentException("Not a valid array schema");
         AbstractArraySchema s = new AbstractArraySchema();
-        if(schema.has("items")) {
+        if (schema.has("items")) {
             s.itemSchema(parse(schema.object("items")));
         }
-        if(schema.has("minItems")) {
+        if (schema.has("minItems")) {
             s.min(schema.number("minItems").intValue());
         }
-        if(schema.has("maxItems")) {
+        if (schema.has("maxItems")) {
             s.max(schema.number("maxItems").intValue());
         }
-        if(schema.has("uniqueItems") && schema.bool("uniqueItems")){
+        if (schema.has("uniqueItems") && schema.bool("uniqueItems")) {
             s.unique();
         }
         return s;
     }
 
-    private AbstractBooleanSchema parseBoolean(AbstractObject schema){
-        if(!schema.string("type").equals("boolean"))
+    private AbstractBooleanSchema parseBoolean(AbstractObject schema) {
+        if (!schema.string("type").equals("boolean"))
             throw new IllegalArgumentException("Not a valid boolean schema");
         AbstractBooleanSchema s = new AbstractBooleanSchema();
-        if(schema.has("const")){
+        if (schema.has("const")) {
             s.staticValue(schema.bool("const"));
         }
 

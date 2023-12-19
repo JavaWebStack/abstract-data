@@ -22,10 +22,10 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractObject object(boolean strict) throws AbstractCoercingException {
-        if(strict)
+        if (strict)
             throw new AbstractCoercingException(Type.OBJECT, Type.ARRAY);
         AbstractObject object = new AbstractObject();
-        for(int i=0; i< elements.size(); i++)
+        for (int i = 0; i < elements.size(); i++)
             object.set(String.valueOf(i), elements.get(i));
         return object;
     }
@@ -227,11 +227,11 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         try {
             int index = Integer.parseInt(q[0]);
             AbstractElement e = get(index);
-            if(e == null || q.length == 1)
+            if (e == null || q.length == 1)
                 return e;
-            if(e.isObject())
+            if (e.isObject())
                 return e.object().query(q[1]);
-            if(e.isArray())
+            if (e.isArray())
                 return e.array().query(q[1]);
             return null;
         } catch (NumberFormatException nfe) {
@@ -281,7 +281,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public List<String> toStringList(boolean strict) {
         List<String> list = new ArrayList<>();
-        for(AbstractElement e : elements)
+        for (AbstractElement e : elements)
             list.add(e.string(strict));
         return list;
     }
@@ -292,7 +292,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
 
     public List<AbstractObject> toObjectList(boolean strict) {
         List<AbstractObject> list = new ArrayList<>();
-        for(AbstractElement e : elements)
+        for (AbstractElement e : elements)
             list.add(e.object(strict));
         return list;
     }
@@ -365,7 +365,7 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         }
     }
 
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         return equals(obj, false);
     }
 

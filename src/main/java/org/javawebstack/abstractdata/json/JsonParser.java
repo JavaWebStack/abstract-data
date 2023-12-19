@@ -13,7 +13,7 @@ public class JsonParser {
     public AbstractElement parse(String json) throws ParseException {
         char[] primChars = json.toCharArray();
         List<Character> chars = new ArrayList<>(primChars.length);
-        for(int i=0; i<primChars.length; i++)
+        for (int i = 0; i < primChars.length; i++)
             chars.add(primChars[i]);
         Deque<Character> stack = new ArrayDeque<>(chars);
         AbstractElement parsed;
@@ -22,11 +22,11 @@ public class JsonParser {
         } catch (NullPointerException ex) {
             throw new ParseException("Unexpected character <EOF>", primChars.length);
         }
-        if(parsed == null) {
+        if (parsed == null) {
             int line = 1;
             int pos = 1;
-            for(int i=0; i<primChars.length - stack.size(); i++) {
-                if(primChars[i] == '\n') {
+            for (int i = 0; i < primChars.length - stack.size(); i++) {
+                if (primChars[i] == '\n') {
                     line++;
                     pos = 1;
                 }
@@ -44,42 +44,42 @@ public class JsonParser {
                 return parseString(stack);
             case 't': {
                 stack.pop();
-                if(stack.peek() != 'r')
+                if (stack.peek() != 'r')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'u')
+                if (stack.peek() != 'u')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'e')
+                if (stack.peek() != 'e')
                     return null;
                 stack.pop();
                 return new AbstractPrimitive(true);
             }
             case 'f': {
                 stack.pop();
-                if(stack.peek() != 'a')
+                if (stack.peek() != 'a')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'l')
+                if (stack.peek() != 'l')
                     return null;
                 stack.pop();
-                if(stack.peek() != 's')
+                if (stack.peek() != 's')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'e')
+                if (stack.peek() != 'e')
                     return null;
                 stack.pop();
                 return new AbstractPrimitive(false);
             }
             case 'n': {
                 stack.pop();
-                if(stack.peek() != 'u')
+                if (stack.peek() != 'u')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'l')
+                if (stack.peek() != 'l')
                     return null;
                 stack.pop();
-                if(stack.peek() != 'l')
+                if (stack.peek() != 'l')
                     return null;
                 stack.pop();
                 return AbstractNull.VALUE;
@@ -117,11 +117,11 @@ public class JsonParser {
         while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e')
             sb.append(stack.pop());
         String s = sb.toString();
-        if(s.contains(".")) {
+        if (s.contains(".")) {
             return new AbstractPrimitive(Double.parseDouble(s));
         } else {
             long l = Long.parseLong(s);
-            if(l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE)
+            if (l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE)
                 return new AbstractPrimitive((int) l);
             return new AbstractPrimitive(l);
         }
@@ -132,9 +132,9 @@ public class JsonParser {
         StringBuilder sb = new StringBuilder();
         while (true) {
             char c = stack.pop();
-            if(c == '"')
+            if (c == '"')
                 break;
-            if(c == '\\') {
+            if (c == '\\') {
                 c = stack.pop();
                 switch (c) {
                     case 'n':
@@ -176,24 +176,24 @@ public class JsonParser {
         AbstractObject object = new AbstractObject();
         while (true) {
             popWhitespace(stack);
-            if(stack.peek() == '}') {
+            if (stack.peek() == '}') {
                 stack.pop();
                 break;
             }
             AbstractPrimitive key = parseString(stack);
-            if(key == null)
+            if (key == null)
                 return null;
             popWhitespace(stack);
-            if(stack.peek() != ':')
+            if (stack.peek() != ':')
                 return null;
             stack.pop();
             popWhitespace(stack);
             AbstractElement value = parse(stack);
-            if(value == null)
+            if (value == null)
                 return null;
             object.set(key.string(), value);
             popWhitespace(stack);
-            if(stack.peek() == ',')
+            if (stack.peek() == ',')
                 stack.pop();
         }
         return object;
@@ -204,16 +204,16 @@ public class JsonParser {
         AbstractArray array = new AbstractArray();
         while (true) {
             popWhitespace(stack);
-            if(stack.peek() == ']') {
+            if (stack.peek() == ']') {
                 stack.pop();
                 break;
             }
             AbstractElement value = parse(stack);
-            if(value == null)
+            if (value == null)
                 return null;
             array.add(value);
             popWhitespace(stack);
-            if(stack.peek() == ',')
+            if (stack.peek() == ',')
                 stack.pop();
         }
         return array;

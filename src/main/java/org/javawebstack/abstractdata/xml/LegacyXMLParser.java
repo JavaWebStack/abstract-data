@@ -28,13 +28,13 @@ public class LegacyXMLParser {
         String tag = element.getTagName();
         XMLElement e = new XMLElement(tag);
         NamedNodeMap attrNodeMap = element.getAttributes();
-        for(int i=0; i<attrNodeMap.getLength(); i++) {
+        for (int i = 0; i < attrNodeMap.getLength(); i++) {
             String name = attrNodeMap.item(i).getNodeName();
             String value = ((Attr) attrNodeMap.item(i)).getValue();
             e.attr(name, value);
         }
         NodeList nodeList = element.getChildNodes();
-        for(int i=0; i<nodeList.getLength(); i++) {
+        for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             switch (node.getNodeType()) {
                 case Node.ATTRIBUTE_NODE: {

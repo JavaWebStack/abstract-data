@@ -11,6 +11,7 @@ public interface NamingPolicy {
     NamingPolicy PASCAL_CASE = new PascalCaseNamingPolicy();
 
     String toAbstract(String source);
+
     String fromAbstract(String source, List<String> fieldNames);
 
 }

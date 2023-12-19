@@ -21,11 +21,11 @@ public class AbstractNumberSchema implements AbstractSchema {
     private final List<CustomValidation<AbstractPrimitive>> customValidations = new ArrayList<>();
 
     public AbstractNumberSchema min(Number min) {
-        return min(min,false);
+        return min(min, false);
     }
 
     public AbstractNumberSchema max(Number max) {
-        return max(max,false);
+        return max(max, false);
     }
 
     public AbstractNumberSchema min(Number min, boolean exclusive) {
@@ -40,7 +40,7 @@ public class AbstractNumberSchema implements AbstractSchema {
         return this;
     }
 
-    public AbstractNumberSchema step(Number step){
+    public AbstractNumberSchema step(Number step) {
         this.step = step;
         return this;
     }
@@ -75,17 +75,17 @@ public class AbstractNumberSchema implements AbstractSchema {
     public AbstractObject toJsonSchema() {
         AbstractObject obj = new AbstractObject();
 
-        obj.set("type",integerOnly ? "integer" : "number");
-        if(min != null && max != null && !minExclusive && !maxExclusive){
+        obj.set("type", integerOnly ? "integer" : "number");
+        if (min != null && max != null && !minExclusive && !maxExclusive) {
             BigDecimal dMin = (min instanceof Float || min instanceof Double) ? BigDecimal.valueOf(min.doubleValue()) : BigDecimal.valueOf(min.longValue());
             BigDecimal dMax = (max instanceof Float || max instanceof Double) ? BigDecimal.valueOf(max.doubleValue()) : BigDecimal.valueOf(max.longValue());
 
-            if(dMin.compareTo(dMax)==0){
-                obj.set("const",min);
+            if (dMin.compareTo(dMax) == 0) {
+                obj.set("const", min);
             }
 
         }
-        if(!obj.has("const")) {
+        if (!obj.has("const")) {
             if (min != null) {
                 obj.set(minExclusive ? "exclusiveMinimum" : "minimum", min);
             }
@@ -103,40 +103,40 @@ public class AbstractNumberSchema implements AbstractSchema {
 
     public List<SchemaValidationError> validate(AbstractPath path, AbstractElement value) {
         List<SchemaValidationError> errors = new ArrayList<>();
-        if(value.getType() != AbstractElement.Type.NUMBER) {
+        if (value.getType() != AbstractElement.Type.NUMBER) {
             errors.add(new SchemaValidationError(path, "invalid_type").meta("expected", integerOnly ? "integer" : "number").meta("actual", value.getType().name().toLowerCase(Locale.ROOT)));
             return errors;
         }
         Number n = value.number();
         BigDecimal dN = (n instanceof Float || n instanceof Double) ? BigDecimal.valueOf(n.doubleValue()) : BigDecimal.valueOf(n.longValue());
-        if(integerOnly && (n instanceof Float || n instanceof Double)) {
+        if (integerOnly && (n instanceof Float || n instanceof Double)) {
             errors.add(new SchemaValidationError(path, "invalid_type").meta("expected", "integer").meta("actual", "number"));
             return errors;
         }
-        if(min != null) {
+        if (min != null) {
             BigDecimal dMin = (min instanceof Float || min instanceof Double) ? BigDecimal.valueOf(min.doubleValue()) : BigDecimal.valueOf(min.longValue());
-            if(!(dN.compareTo(dMin) > (minExclusive ? 0 : -1))) {
+            if (!(dN.compareTo(dMin) > (minExclusive ? 0 : -1))) {
                 errors.add(new SchemaValidationError(path, "number_smaller_than_min").meta("min", dMin.toPlainString()).meta("actual", dN.toPlainString()));
             }
         }
-        if(max != null) {
+        if (max != null) {
             BigDecimal dMax = (max instanceof Float || max instanceof Double) ? BigDecimal.valueOf(max.doubleValue()) : BigDecimal.valueOf(max.longValue());
-            if(!(dN.compareTo(dMax) < (maxExclusive ? 0 : 1))) {
+            if (!(dN.compareTo(dMax) < (maxExclusive ? 0 : 1))) {
                 errors.add(new SchemaValidationError(path, "number_larger_than_max").meta("max", dMax.toPlainString()).meta("actual", dN.toPlainString()));
             }
         }
-        if(step != null) {
-            if(min != null && minExclusive){
+        if (step != null) {
+            if (min != null && minExclusive) {
                 throw new UnsupportedOperationException("Step is not supported together with an exclusive minimum");
             }
             BigDecimal dMin = min == null ? BigDecimal.ZERO : (min instanceof Float || min instanceof Double) ? BigDecimal.valueOf(min.doubleValue()) : BigDecimal.valueOf(min.longValue());
-            BigDecimal dStep =  (step instanceof Float || step instanceof Double) ? BigDecimal.valueOf(step.doubleValue()) : BigDecimal.valueOf(step.longValue());
+            BigDecimal dStep = (step instanceof Float || step instanceof Double) ? BigDecimal.valueOf(step.doubleValue()) : BigDecimal.valueOf(step.longValue());
 
-            if(dN.subtract(dMin).remainder(dStep).compareTo(BigDecimal.ZERO) != 0) {
-                errors.add(new SchemaValidationError(path, "number_not_within_step").meta("step", dStep.toPlainString()).meta("actual", dN.toPlainString()).meta("start",dMin.toPlainString()));
+            if (dN.subtract(dMin).remainder(dStep).compareTo(BigDecimal.ZERO) != 0) {
+                errors.add(new SchemaValidationError(path, "number_not_within_step").meta("step", dStep.toPlainString()).meta("actual", dN.toPlainString()).meta("start", dMin.toPlainString()));
             }
         }
-        for(CustomValidation<AbstractPrimitive> validation : customValidations) {
+        for (CustomValidation<AbstractPrimitive> validation : customValidations) {
             errors.addAll(validation.validate(path, value.primitive()));
         }
         return errors;

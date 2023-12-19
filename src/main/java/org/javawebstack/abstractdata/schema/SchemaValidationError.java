@@ -58,14 +58,14 @@ public class SchemaValidationError {
 
     public String getErrorDescription(Map<String, String> customDescriptions) {
         String message;
-        if(customDescriptions.containsKey(error)) {
+        if (customDescriptions.containsKey(error)) {
             message = customDescriptions.get(error);
-        } else if(BUILTIN_DESCRIPTIONS.containsKey(error)) {
+        } else if (BUILTIN_DESCRIPTIONS.containsKey(error)) {
             message = BUILTIN_DESCRIPTIONS.get(error);
         } else {
             return error;
         }
-        for(String key : errorMeta.keySet()) {
+        for (String key : errorMeta.keySet()) {
             message = message.replace("{" + key + "}", errorMeta.get(key));
         }
         return message;
@@ -73,7 +73,7 @@ public class SchemaValidationError {
 
     public static Map<AbstractPath, List<SchemaValidationError>> groupErrors(List<SchemaValidationError> errors) {
         Map<AbstractPath, List<SchemaValidationError>> errorMap = new HashMap<>();
-        for(SchemaValidationError e : errors) {
+        for (SchemaValidationError e : errors) {
             errorMap.computeIfAbsent(e.getPath(), k -> new ArrayList<>()).add(e);
         }
         return errorMap;

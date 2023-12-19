@@ -29,31 +29,31 @@ public class JsonDumper {
     }
 
     private List<String> dumpLines(AbstractElement element) {
-        if(element == null || element.isNull())
+        if (element == null || element.isNull())
             return Collections.singletonList("null");
-        if(element.isBoolean())
+        if (element.isBoolean())
             return Collections.singletonList(element.bool().toString());
-        if(element.isNumber())
+        if (element.isNumber())
             return Collections.singletonList(element.number().toString());
-        if(element.isString())
+        if (element.isString())
             return Collections.singletonList("\"" + escape(element.string()) + "\"");
-        if(element.isObject()) {
-            List<String> lines =new ArrayList<>();
-            if(element.object().size() == 0) {
+        if (element.isObject()) {
+            List<String> lines = new ArrayList<>();
+            if (element.object().size() == 0) {
                 lines.add("{}");
                 return lines;
             }
-            if(pretty) {
+            if (pretty) {
                 lines.add("{");
                 List<String> keys = new ArrayList<>(element.object().keys());
-                for(int i=0; i<keys.size(); i++) {
+                for (int i = 0; i < keys.size(); i++) {
                     String k = keys.get(i);
                     List<String> vLines = dumpLines(element.object().get(k));
                     lines.add(indent + "\"" + escape(k) + "\": " + vLines.get(0));
-                    for(int j=1; j<vLines.size(); j++)
+                    for (int j = 1; j < vLines.size(); j++)
                         lines.add(indent + vLines.get(j));
-                    if(i+1 < keys.size())
-                        lines.set(lines.size()-1, lines.get(lines.size()-1) + ",");
+                    if (i + 1 < keys.size())
+                        lines.set(lines.size() - 1, lines.get(lines.size() - 1) + ",");
                 }
                 lines.add("}");
             } else {
@@ -61,21 +61,21 @@ public class JsonDumper {
             }
             return lines;
         }
-        if(element.isArray()) {
-            List<String> lines =new ArrayList<>();
-            if(element.array().size() == 0) {
+        if (element.isArray()) {
+            List<String> lines = new ArrayList<>();
+            if (element.array().size() == 0) {
                 lines.add("[]");
                 return lines;
             }
-            if(pretty) {
+            if (pretty) {
                 lines.add("[");
                 AbstractArray array = element.array();
-                for(int i=0; i<array.size(); i++) {
+                for (int i = 0; i < array.size(); i++) {
                     List<String> vLines = dumpLines(array.get(i));
-                    for(int j=0; j<vLines.size(); j++)
+                    for (int j = 0; j < vLines.size(); j++)
                         lines.add(indent + vLines.get(j));
-                    if(i+1 < array.size())
-                        lines.set(lines.size()-1, lines.get(lines.size()-1) + ",");
+                    if (i + 1 < array.size())
+                        lines.set(lines.size() - 1, lines.get(lines.size() - 1) + ",");
                 }
                 lines.add("]");
             } else {
@@ -88,9 +88,9 @@ public class JsonDumper {
 
     private static String escape(String s) {
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
-            switch(ch) {
+            switch (ch) {
                 case '"':
                     sb.append("\\\"");
                     break;
@@ -122,7 +122,7 @@ public class JsonDumper {
                     if (ch <= '\u001F' || ch >= '\u007F' && ch <= '\u009F' || ch >= '\u2000' && ch <= '\u20FF') {
                         String hex = Integer.toHexString(ch);
                         sb.append("\\u");
-                        for(int k=0; k < 4-hex.length(); k++)
+                        for (int k = 0; k < 4 - hex.length(); k++)
                             sb.append('0');
                         sb.append(hex.toUpperCase(Locale.ROOT));
                     } else {
