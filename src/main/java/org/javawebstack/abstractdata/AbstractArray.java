@@ -30,76 +30,109 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
         return object;
     }
 
+    @Deprecated
     public AbstractObject object(String key) throws AbstractCoercingException {
-        return query(key).object();
+        AbstractElement e = query(key);
+        return e != null ? e.object() : null;
     }
 
+    @Deprecated
     public AbstractArray array(String key) throws AbstractCoercingException {
-        return query(key).array();
+        AbstractElement e = query(key);
+        return e != null ? e.array() : null;
     }
 
+    @Deprecated
     public AbstractPrimitive primitive(String key) throws AbstractCoercingException {
-        return query(key).primitive();
+        AbstractElement e = query(key);
+        return e != null ? e.primitive() : null;
     }
 
+    @Deprecated
     public String string(String key) throws AbstractCoercingException {
-        return query(key).string();
+        AbstractElement e = query(key);
+        return e != null ? e.string() : null;
     }
 
+    @Deprecated
     public Boolean bool(String key) throws AbstractCoercingException {
-        return query(key).bool();
+        AbstractElement e = query(key);
+        return e != null ? e.bool() : null;
     }
 
+    @Deprecated
     public Number number(String key) throws AbstractCoercingException {
-        return query(key).number();
+        AbstractElement e = query(key);
+        return e != null ? e.number() : null;
     }
 
+    @Deprecated
     public AbstractObject object(String key, AbstractObject orElse) throws AbstractCoercingException {
-        return query(key, orElse).object();
+        AbstractElement e = query(key, orElse);
+        return e != null ? e.object() : null;
     }
 
+    @Deprecated
     public AbstractArray array(String key, AbstractArray orElse) throws AbstractCoercingException {
-        return query(key, orElse).array();
+        AbstractElement e = query(key, orElse);
+        return e != null ? e.array() : null;
     }
 
+    @Deprecated
     public AbstractPrimitive primitive(String key, AbstractPrimitive orElse) throws AbstractCoercingException {
-        return query(key, orElse).primitive();
+        AbstractElement e = query(key, orElse);
+        return e != null ? e.primitive() : null;
     }
 
+    @Deprecated
     public String string(String key, String orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).string();
+        AbstractPrimitive orElsePrimitive = orElse != null ? new AbstractPrimitive(orElse) : null;
+        AbstractElement e = primitive(key, orElsePrimitive);
+        return e != null ? e.string() : null;
     }
 
+    @Deprecated
     public Boolean bool(String key, Boolean orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).bool();
+        AbstractPrimitive orElsePrimitive = orElse != null ? new AbstractPrimitive(orElse) : null;
+        AbstractElement e = primitive(key, orElsePrimitive);
+        return e != null ? e.bool() : null;
     }
 
+    @Deprecated
     public Number number(String key, Number orElse) throws AbstractCoercingException {
-        return query(key, new AbstractPrimitive(orElse)).number();
+        AbstractPrimitive orElsePrimitive = orElse != null ? new AbstractPrimitive(orElse) : null;
+        AbstractElement e = primitive(key, orElsePrimitive);
+        return e != null ? e.number() : null;
     }
 
     public AbstractObject object(int index) throws AbstractCoercingException {
-        return get(index).object();
+        AbstractElement e = get(index);
+        return e != null ? e.object() : null;
     }
 
     public AbstractArray array(int index) throws AbstractCoercingException {
-        return get(index).array();
+        AbstractElement e = get(index);
+        return e != null ? e.array() : null;
     }
 
     public AbstractPrimitive primitive(int index) throws AbstractCoercingException {
-        return get(index).primitive();
+        AbstractElement e = get(index);
+        return e != null ? e.primitive() : null;
     }
 
     public String string(int index) throws AbstractCoercingException {
-        return get(index).string();
+        AbstractElement e = get(index);
+        return e != null ? e.string() : null;
     }
 
     public Boolean bool(int index) throws AbstractCoercingException {
-        return get(index).bool();
+        AbstractElement e = get(index);
+        return e != null ? e.bool() : null;
     }
 
     public Number number(int index) throws AbstractCoercingException {
-        return get(index).number();
+        AbstractElement e = get(index);
+        return e != null ? e.number() : null;
     }
 
     public AbstractObject object(int index, AbstractObject orElse) throws AbstractCoercingException {
@@ -214,6 +247,8 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractElement get(int i) {
+        if(i >= elements.size())
+            return null;
         return elements.get(i);
     }
 
@@ -223,6 +258,8 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractElement query(String query) {
+        if(query == null)
+            throw new IllegalArgumentException("query can not be null");
         String[] q = query.split("\\.", 2);
         try {
             int index = Integer.parseInt(q[0]);
@@ -370,6 +407,8 @@ public class AbstractArray implements AbstractElement, Iterable<AbstractElement>
     }
 
     public AbstractArray addAll(AbstractArray array) {
+        if(array == null)
+            throw new IllegalArgumentException("array may not be null");
         elements.addAll(array.elements);
         return this;
     }
