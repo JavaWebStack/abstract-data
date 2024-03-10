@@ -46,7 +46,6 @@ public class AbstractArrayCollector<T> implements Collector<T, List<AbstractElem
 
     public Set<Characteristics> characteristics() {
         Set<Characteristics> characteristics = new HashSet<>();
-        characteristics.add(Characteristics.UNORDERED);
         return characteristics;
     }
 

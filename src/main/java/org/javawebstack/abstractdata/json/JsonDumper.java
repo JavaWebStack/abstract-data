@@ -83,7 +83,7 @@ public class JsonDumper {
             }
             return lines;
         }
-        return new ArrayList<>();
+        throw new IllegalArgumentException("Unknown element type"); // Should be unreachable
     }
 
     private static String escape(String s) {
