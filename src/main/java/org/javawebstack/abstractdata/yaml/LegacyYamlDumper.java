@@ -8,14 +8,14 @@ public class LegacyYamlDumper {
 
     protected static String dump(AbstractElement e, boolean pretty) {
         Yaml yaml;
+        DumperOptions options = new DumperOptions();
         if (pretty) {
-            DumperOptions options = new DumperOptions();
             options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             options.setPrettyFlow(true);
-            yaml = new Yaml(options);
         } else {
-            yaml = new Yaml();
+            options.setPrettyFlow(false);
         }
+        yaml = new Yaml(options);
         return yaml.dump(e.toObject());
     }
 

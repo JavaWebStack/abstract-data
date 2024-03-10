@@ -120,7 +120,11 @@ public interface AbstractElement {
     }
 
     static AbstractElement fromYaml(String source, boolean singleRoot) {
-        return new YamlParser().setSingleRoot(singleRoot).parse(source);
+        try {
+            return new YamlParser().setSingleRoot(singleRoot).parse(source);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static AbstractElement fromYaml(String source) {
