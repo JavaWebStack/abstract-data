@@ -3,10 +3,7 @@ package org.javawebstack.abstractdata.json;
 import org.javawebstack.abstractdata.*;
 
 import java.text.ParseException;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class JsonParser {
 
@@ -19,7 +16,7 @@ public class JsonParser {
         AbstractElement parsed;
         try {
             parsed = parse(stack);
-        } catch (NullPointerException ex) {
+        } catch (NoSuchElementException | NullPointerException ex) {
             throw new ParseException("Unexpected character <EOF>", primChars.length);
         }
         if (parsed == null) {
@@ -28,11 +25,11 @@ public class JsonParser {
             for (int i = 0; i < primChars.length - stack.size(); i++) {
                 if (primChars[i] == '\n') {
                     line++;
-                    pos = 1;
+                    pos = 0;
                 }
                 pos++;
             }
-            throw new ParseException("Unexpected character '" + stack.pop() + "' at line " + line + " pos " + pos, primChars.length - stack.size());
+            throw new ParseException("Unexpected character '" + stack.pop() + "' at line " + line + " pos " + pos, primChars.length - stack.size() - 1);
         }
         return parsed;
     }
@@ -114,7 +111,7 @@ public class JsonParser {
 
     private AbstractPrimitive parseNumber(Deque<Character> stack) {
         StringBuilder sb = new StringBuilder();
-        while (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e')
+        while (stack.peek() != null && (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '+' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e'))
             sb.append(stack.pop());
         String s = sb.toString();
         if (s.contains(".")) {
@@ -181,8 +178,6 @@ public class JsonParser {
                 break;
             }
             AbstractPrimitive key = parseString(stack);
-            if (key == null)
-                return null;
             popWhitespace(stack);
             if (stack.peek() != ':')
                 return null;
@@ -193,8 +188,11 @@ public class JsonParser {
                 return null;
             object.set(key.string(), value);
             popWhitespace(stack);
-            if (stack.peek() == ',')
+            if (stack.peek() == ',') {
                 stack.pop();
+            } else if(stack.peek() != '}') {
+                return null;
+            }
         }
         return object;
     }
@@ -213,8 +211,11 @@ public class JsonParser {
                 return null;
             array.add(value);
             popWhitespace(stack);
-            if (stack.peek() == ',')
+            if (stack.peek() == ',') {
                 stack.pop();
+            } else if(stack.peek() != ']') {
+                return null;
+            }
         }
         return array;
     }
