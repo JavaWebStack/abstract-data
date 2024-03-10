@@ -7,6 +7,8 @@ import org.javawebstack.abstractdata.exception.AbstractCoercingException;
 import org.javawebstack.abstractdata.json.JsonDumper;
 import org.javawebstack.abstractdata.json.JsonParser;
 import org.javawebstack.abstractdata.util.QueryString;
+import org.javawebstack.abstractdata.yaml.YamlDumper;
+import org.javawebstack.abstractdata.yaml.YamlParser;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -110,16 +112,7 @@ public interface AbstractElement {
     Object toObject();
 
     default String toYaml(boolean pretty) {
-        Yaml yaml;
-        if (pretty) {
-            DumperOptions options = new DumperOptions();
-            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-            options.setPrettyFlow(true);
-            yaml = new Yaml(options);
-        } else {
-            yaml = new Yaml();
-        }
-        return yaml.dump(toObject());
+        return new YamlDumper().setPretty(pretty).dump(this);
     }
 
     default String toYaml() {
@@ -127,24 +120,19 @@ public interface AbstractElement {
     }
 
     static AbstractElement fromYaml(String source, boolean singleRoot) {
-        Yaml yaml = new Yaml();
-        Object object = yaml.load(source);
-        if (singleRoot && object instanceof List) {
-            List<Object> list = (List<Object>) object;
-            if (list.size() == 0) {
-                object = new HashMap<>();
-            } else {
-                object = list.get(0);
-            }
-        }
-        return fromAbstractObject(object);
+        return new YamlParser().setSingleRoot(singleRoot).parse(source);
     }
 
     static AbstractElement fromYaml(String source) {
         return fromYaml(source, false);
     }
 
+    @Deprecated
     static AbstractElement fromAbstractObject(Object object) {
+        return fromObject(object);
+    }
+
+    static AbstractElement fromObject(Object object) {
         if (object == null)
             return AbstractNull.VALUE;
         if (object instanceof List) {
