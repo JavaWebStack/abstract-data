@@ -68,8 +68,7 @@
 
     <build>
         <plugins>
-            <plugins>
-                <plugin>
+            <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
                 <version>0.9.0</version>
