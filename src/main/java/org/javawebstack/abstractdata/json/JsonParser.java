@@ -111,17 +111,29 @@ public class JsonParser {
 
     private AbstractPrimitive parseNumber(Deque<Character> stack) {
         StringBuilder sb = new StringBuilder();
-        while (stack.peek() != null && (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '+' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e'))
-            sb.append(stack.pop());
-        String s = sb.toString();
-        if (s.contains(".")) {
-            return new AbstractPrimitive(Double.parseDouble(s));
-        } else {
-            long l = Long.parseLong(s);
-            if (l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE)
-                return new AbstractPrimitive((int) l);
-            return new AbstractPrimitive(l);
+        for (char c : stack) {
+            if (Character.isDigit(c) || c == '.' || c == '+' || c == '-' || c == 'E' || c == 'e')
+                sb.append(c);
+            else
+                break;
         }
+        String s = sb.toString();
+        AbstractPrimitive result;
+        try {
+            if (s.contains(".") || s.contains("e") || s.contains("E")) {
+                result = new AbstractPrimitive(Double.parseDouble(s));
+            } else {
+                long l = Long.parseLong(s);
+                result = l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE ? new AbstractPrimitive((int) l) : new AbstractPrimitive(l);
+            }
+        } catch (NumberFormatException e) {
+            // Not actually a valid number: leave the characters on the stack so the
+            // caller reports a proper ParseException at the offending position.
+            return null;
+        }
+        for (int i = 0; i < s.length(); i++)
+            stack.pop();
+        return result;
     }
 
     private AbstractPrimitive parseString(Deque<Character> stack) {

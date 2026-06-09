@@ -92,6 +92,29 @@ public class JsonParserTest {
     }
 
     @Test
+    public void testParseScientificNotation() {
+        AbstractElement e = assertDoesNotThrow(() -> new JsonParser().parse("1e3"));
+        assertTrue(e.isNumber());
+        assertEquals(1000.0, e.number());
+        e = assertDoesNotThrow(() -> new JsonParser().parse("2.5E-2"));
+        assertTrue(e.isNumber());
+        assertEquals(0.025, e.number());
+    }
+
+    @Test
+    public void testParseMalformedNumber() {
+        // See issue #31: malformed numbers must fail fast with a ParseException
+        // instead of leaking a NumberFormatException.
+        ParseException e = assertThrows(ParseException.class, () -> new JsonParser().parse("--"));
+        assertEquals("Unexpected character '-' at line 1 pos 1", e.getMessage());
+        assertThrows(ParseException.class, () -> new JsonParser().parse("-"));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("1.2.3"));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("12e"));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("."));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("[--]"));
+    }
+
+    @Test
     public void testParseStringEscapeSeq() {
         Map<String, String> escapes = new HashMap<>();
         escapes.put("\\\"", "\"");
