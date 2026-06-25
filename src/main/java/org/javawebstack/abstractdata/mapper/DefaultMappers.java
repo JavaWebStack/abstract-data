@@ -336,6 +336,7 @@ public final class DefaultMappers {
 
         public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
             DateFormat df = context.getAnnotation(DateFormat.class);
+            String raw = element.isPrimitive() ? element.string() : element.toJsonString();
             try {
                 if (df != null && df.epoch()) {
                     if (!type.equals(Instant.class))
@@ -348,10 +349,12 @@ public final class DefaultMappers {
                     formatter = DateTimeFormatter.ofPattern(df.value());
                     if (df.timezone().length() > 0)
                         formatter = formatter.withZone(ZoneId.of(df.timezone()));
+                    else if (type.equals(Instant.class))
+                        formatter = formatter.withZone(ZoneOffset.UTC);
                 }
                 return parse(type, element.string(context.getMapper().isStrict()), formatter);
             } catch (DateTimeException | IllegalArgumentException | AbstractCoercingException ex) {
-                throw new MapperException("Failed to parse date '" + element.string() + "'" + (context.getField() != null ? " for field '" + context.getFieldName() + "'" : ""));
+                throw new MapperException("Failed to parse date '" + raw + "'" + (context.getField() != null ? " for field '" + context.getFieldName() + "'" : ""));
             }
         }
 

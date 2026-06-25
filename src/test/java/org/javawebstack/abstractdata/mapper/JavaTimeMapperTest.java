@@ -92,4 +92,26 @@ public class JavaTimeMapperTest {
     public void testMalformedValueThrowsMapperException() {
         assertThrows(MapperException.class, () -> new Mapper().map(new org.javawebstack.abstractdata.AbstractPrimitive("not-a-date"), LocalDate.class));
     }
+
+    @Test
+    public void testNonPrimitiveValueThrowsMapperException() {
+        assertThrows(MapperException.class, () -> new Mapper().map(new org.javawebstack.abstractdata.AbstractObject(), LocalDate.class));
+    }
+
+    static class InstantPatternHolder {
+        @DateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        Instant ts;
+    }
+
+    @Test
+    public void testCustomPatternInstantRoundTrip() {
+        InstantPatternHolder holder = new InstantPatternHolder();
+        holder.ts = Instant.parse("2026-06-09T13:50:45Z");
+
+        AbstractElement element = assertDoesNotThrow(() -> new Mapper().map(holder));
+        assertEquals("2026-06-09T13:50:45", element.object().get("ts").string());
+
+        InstantPatternHolder parsed = assertDoesNotThrow(() -> new Mapper().map(element, InstantPatternHolder.class));
+        assertEquals(holder.ts, parsed.ts);
+    }
 }
