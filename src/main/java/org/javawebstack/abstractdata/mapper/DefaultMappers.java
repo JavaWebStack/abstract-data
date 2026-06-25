@@ -12,6 +12,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ public final class DefaultMappers {
     public static final CollectionMapper COLLECTION = new CollectionMapper();
     public static final MapMapper MAP = new MapMapper();
     public static final DateMapper DATE = new DateMapper();
+    public static final JavaTimeMapper JAVA_TIME = new JavaTimeMapper();
     public static final AbstractMapper ABSTRACT = new AbstractMapper();
 
     public static final FallbackMapper FALLBACK = new FallbackMapper();
@@ -34,7 +38,8 @@ public final class DefaultMappers {
                 PRIMITIVE,
                 COLLECTION,
                 MAP,
-                DATE
+                DATE,
+                JAVA_TIME
         }) {
             for (Class<?> type : adapter.getSupportedTypes())
                 map.put(type, adapter);
@@ -293,6 +298,102 @@ public final class DefaultMappers {
                     Date.class,
                     Timestamp.class,
                     java.sql.Date.class
+            };
+        }
+
+    }
+
+    public static final class JavaTimeMapper implements MapperTypeAdapter {
+
+        private JavaTimeMapper() {
+        }
+
+        public AbstractElement toAbstract(MapperContext context, Object value) throws MapperException {
+            if (!(value instanceof TemporalAccessor))
+                return null;
+            DateFormat df = context.getAnnotation(DateFormat.class);
+            try {
+                if (df != null && df.epoch()) {
+                    if (!(value instanceof Instant))
+                        throw new MapperException("@DateFormat epoch mode is only supported for Instant, not '" + value.getClass().getName() + "'");
+                    Instant instant = (Instant) value;
+                    return new AbstractPrimitive(df.millis() ? instant.toEpochMilli() : instant.getEpochSecond());
+                }
+                if (df != null && df.value().length() > 0) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(df.value());
+                    if (df.timezone().length() > 0)
+                        formatter = formatter.withZone(ZoneId.of(df.timezone()));
+                    else if (value instanceof Instant)
+                        formatter = formatter.withZone(ZoneOffset.UTC);
+                    return new AbstractPrimitive(formatter.format((TemporalAccessor) value));
+                }
+                // Each supported type's toString() is its canonical ISO-8601 form and round-trips through its own parse().
+                return new AbstractPrimitive(value.toString());
+            } catch (DateTimeException | IllegalArgumentException ex) {
+                throw new MapperException("Failed to format date" + (context.getField() != null ? " for field '" + context.getFieldName() + "'" : "") + ": " + ex.getMessage());
+            }
+        }
+
+        public Object fromAbstract(MapperContext context, AbstractElement element, Class<?> type) throws MapperException {
+            DateFormat df = context.getAnnotation(DateFormat.class);
+            String raw = element.isPrimitive() ? element.string() : element.toJsonString();
+            try {
+                if (df != null && df.epoch()) {
+                    if (!type.equals(Instant.class))
+                        throw new MapperException("@DateFormat epoch mode is only supported for Instant, not '" + type.getName() + "'");
+                    long time = element.number(context.getMapper().isStrict()).longValue();
+                    return df.millis() ? Instant.ofEpochMilli(time) : Instant.ofEpochSecond(time);
+                }
+                DateTimeFormatter formatter = null;
+                if (df != null && df.value().length() > 0) {
+                    formatter = DateTimeFormatter.ofPattern(df.value());
+                    if (df.timezone().length() > 0)
+                        formatter = formatter.withZone(ZoneId.of(df.timezone()));
+                    else if (type.equals(Instant.class))
+                        formatter = formatter.withZone(ZoneOffset.UTC);
+                }
+                return parse(type, element.string(context.getMapper().isStrict()), formatter);
+            } catch (DateTimeException | IllegalArgumentException | AbstractCoercingException ex) {
+                throw new MapperException("Failed to parse date '" + raw + "'" + (context.getField() != null ? " for field '" + context.getFieldName() + "'" : ""));
+            }
+        }
+
+        private Object parse(Class<?> type, String s, DateTimeFormatter formatter) throws MapperException {
+            if (type.equals(LocalDate.class))
+                return formatter == null ? LocalDate.parse(s) : LocalDate.parse(s, formatter);
+            if (type.equals(LocalDateTime.class))
+                return formatter == null ? LocalDateTime.parse(s) : LocalDateTime.parse(s, formatter);
+            if (type.equals(LocalTime.class))
+                return formatter == null ? LocalTime.parse(s) : LocalTime.parse(s, formatter);
+            if (type.equals(Instant.class))
+                return formatter == null ? Instant.parse(s) : formatter.parse(s, Instant::from);
+            if (type.equals(OffsetDateTime.class))
+                return formatter == null ? OffsetDateTime.parse(s) : OffsetDateTime.parse(s, formatter);
+            if (type.equals(ZonedDateTime.class))
+                return formatter == null ? ZonedDateTime.parse(s) : ZonedDateTime.parse(s, formatter);
+            if (type.equals(OffsetTime.class))
+                return formatter == null ? OffsetTime.parse(s) : OffsetTime.parse(s, formatter);
+            if (type.equals(Year.class))
+                return formatter == null ? Year.parse(s) : Year.parse(s, formatter);
+            if (type.equals(YearMonth.class))
+                return formatter == null ? YearMonth.parse(s) : YearMonth.parse(s, formatter);
+            if (type.equals(MonthDay.class))
+                return formatter == null ? MonthDay.parse(s) : MonthDay.parse(s, formatter);
+            throw new MapperException("Unsupported java.time type '" + type.getName() + "'");
+        }
+
+        public Class<?>[] getSupportedTypes() {
+            return new Class[]{
+                    LocalDate.class,
+                    LocalDateTime.class,
+                    LocalTime.class,
+                    Instant.class,
+                    OffsetDateTime.class,
+                    ZonedDateTime.class,
+                    OffsetTime.class,
+                    Year.class,
+                    YearMonth.class,
+                    MonthDay.class
             };
         }
 

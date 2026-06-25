@@ -111,16 +111,44 @@ public class JsonParser {
 
     private AbstractPrimitive parseNumber(Deque<Character> stack) {
         StringBuilder sb = new StringBuilder();
-        while (stack.peek() != null && (Character.isDigit(stack.peek()) || stack.peek() == '.' || stack.peek() == '+' || stack.peek() == '-' || stack.peek() == 'E' || stack.peek() == 'e'))
-            sb.append(stack.pop());
+        for (char c : stack) {
+            if (Character.isDigit(c) || c == '.' || c == '+' || c == '-' || c == 'E' || c == 'e')
+                sb.append(c);
+            else
+                break;
+        }
         String s = sb.toString();
-        if (s.contains(".")) {
-            return new AbstractPrimitive(Double.parseDouble(s));
-        } else {
+        AbstractPrimitive result = toNumber(s);
+        if (result == null) {
+            // Malformed token (e.g. "1.2.3", "12e"): consume the longest valid numeric prefix
+            // so the caller reports the ParseException at the offending character instead of the
+            // token start. The token is still rejected as a whole -- no partial number is accepted.
+            int valid = 0;
+            for (int i = s.length() - 1; i > 0; i--) {
+                if (toNumber(s.substring(0, i)) != null) {
+                    valid = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < valid; i++)
+                stack.pop();
+            return null;
+        }
+        for (int i = 0; i < s.length(); i++)
+            stack.pop();
+        return result;
+    }
+
+    private AbstractPrimitive toNumber(String s) {
+        if (s.isEmpty())
+            return null;
+        try {
+            if (s.contains(".") || s.contains("e") || s.contains("E"))
+                return new AbstractPrimitive(Double.parseDouble(s));
             long l = Long.parseLong(s);
-            if (l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE)
-                return new AbstractPrimitive((int) l);
-            return new AbstractPrimitive(l);
+            return l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE ? new AbstractPrimitive((int) l) : new AbstractPrimitive(l);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

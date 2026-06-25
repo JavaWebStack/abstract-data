@@ -92,6 +92,35 @@ public class JsonParserTest {
     }
 
     @Test
+    public void testParseScientificNotation() {
+        AbstractElement e = assertDoesNotThrow(() -> new JsonParser().parse("1e3"));
+        assertTrue(e.isNumber());
+        assertEquals(1000.0, e.number());
+        e = assertDoesNotThrow(() -> new JsonParser().parse("2.5E-2"));
+        assertTrue(e.isNumber());
+        assertEquals(0.025, e.number());
+    }
+
+    @Test
+    public void testParseMalformedNumber() {
+        // See issue #31: malformed numbers must fail fast with a ParseException
+        // instead of leaking a NumberFormatException.
+        ParseException e = assertThrows(ParseException.class, () -> new JsonParser().parse("--"));
+        assertEquals("Unexpected character '-' at line 1 pos 1", e.getMessage());
+        assertThrows(ParseException.class, () -> new JsonParser().parse("-"));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("."));
+        assertThrows(ParseException.class, () -> new JsonParser().parse("[--]"));
+
+        // The error points at the offending character within the token, not the token start.
+        e = assertThrows(ParseException.class, () -> new JsonParser().parse("1.2.3"));
+        assertEquals("Unexpected character '.' at line 1 pos 4", e.getMessage());
+        assertEquals(3, e.getErrorOffset());
+        e = assertThrows(ParseException.class, () -> new JsonParser().parse("12e"));
+        assertEquals("Unexpected character 'e' at line 1 pos 3", e.getMessage());
+        assertEquals(2, e.getErrorOffset());
+    }
+
+    @Test
     public void testParseStringEscapeSeq() {
         Map<String, String> escapes = new HashMap<>();
         escapes.put("\\\"", "\"");
