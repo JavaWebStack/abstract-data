@@ -108,10 +108,16 @@ public class JsonParserTest {
         ParseException e = assertThrows(ParseException.class, () -> new JsonParser().parse("--"));
         assertEquals("Unexpected character '-' at line 1 pos 1", e.getMessage());
         assertThrows(ParseException.class, () -> new JsonParser().parse("-"));
-        assertThrows(ParseException.class, () -> new JsonParser().parse("1.2.3"));
-        assertThrows(ParseException.class, () -> new JsonParser().parse("12e"));
         assertThrows(ParseException.class, () -> new JsonParser().parse("."));
         assertThrows(ParseException.class, () -> new JsonParser().parse("[--]"));
+
+        // The error points at the offending character within the token, not the token start.
+        e = assertThrows(ParseException.class, () -> new JsonParser().parse("1.2.3"));
+        assertEquals("Unexpected character '.' at line 1 pos 4", e.getMessage());
+        assertEquals(3, e.getErrorOffset());
+        e = assertThrows(ParseException.class, () -> new JsonParser().parse("12e"));
+        assertEquals("Unexpected character 'e' at line 1 pos 3", e.getMessage());
+        assertEquals(2, e.getErrorOffset());
     }
 
     @Test

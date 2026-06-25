@@ -118,22 +118,38 @@ public class JsonParser {
                 break;
         }
         String s = sb.toString();
-        AbstractPrimitive result;
-        try {
-            if (s.contains(".") || s.contains("e") || s.contains("E")) {
-                result = new AbstractPrimitive(Double.parseDouble(s));
-            } else {
-                long l = Long.parseLong(s);
-                result = l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE ? new AbstractPrimitive((int) l) : new AbstractPrimitive(l);
+        AbstractPrimitive result = toNumber(s);
+        if (result == null) {
+            // Malformed token (e.g. "1.2.3", "12e"): consume the longest valid numeric prefix
+            // so the caller reports the ParseException at the offending character instead of the
+            // token start. The token is still rejected as a whole -- no partial number is accepted.
+            int valid = 0;
+            for (int i = s.length() - 1; i > 0; i--) {
+                if (toNumber(s.substring(0, i)) != null) {
+                    valid = i;
+                    break;
+                }
             }
-        } catch (NumberFormatException e) {
-            // Not actually a valid number: leave the characters on the stack so the
-            // caller reports a proper ParseException at the offending position.
+            for (int i = 0; i < valid; i++)
+                stack.pop();
             return null;
         }
         for (int i = 0; i < s.length(); i++)
             stack.pop();
         return result;
+    }
+
+    private AbstractPrimitive toNumber(String s) {
+        if (s.isEmpty())
+            return null;
+        try {
+            if (s.contains(".") || s.contains("e") || s.contains("E"))
+                return new AbstractPrimitive(Double.parseDouble(s));
+            long l = Long.parseLong(s);
+            return l >= Integer.MIN_VALUE && l <= Integer.MAX_VALUE ? new AbstractPrimitive((int) l) : new AbstractPrimitive(l);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private AbstractPrimitive parseString(Deque<Character> stack) {
